@@ -1,0 +1,16 @@
+language: go
+
+go: 
+  - 1.11.x
+
+before_install:
+  - go get github.com/mitchellh/gox
+
+install:
+  - # skip
+
+script:
+  - diff -u <(echo -n) <(gofmt -d .)
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race ./...
+  - gox -os="linux darwin windows" -arch="amd64" -output="apw.{{.OS}}.{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
