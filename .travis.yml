@@ -5,6 +5,8 @@ go:
 
 before_install:
   - go get github.com/mitchellh/gox
+  - go get github.com/gobuffalo/packr/packr
+  - packr
 
 install:
   - go get -t -v ./...
