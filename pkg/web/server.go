@@ -1,0 +1,33 @@
+package web
+
+import (
+	"log"
+	"net/http"
+
+	config "github.com/nilbelec/amazon-price-watcher/pkg/configuration"
+	"github.com/nilbelec/amazon-price-watcher/pkg/services"
+
+	"github.com/nilbelec/amazon-price-watcher/pkg/web/configuration"
+	"github.com/nilbelec/amazon-price-watcher/pkg/web/home"
+	"github.com/nilbelec/amazon-price-watcher/pkg/web/products"
+)
+
+// Server web server
+type Server struct {
+	ps     *services.ProductService
+	config *config.File
+}
+
+// NewServer creates a new web server
+func NewServer(ps *services.ProductService, config *config.File) *Server {
+	return &Server{ps, config}
+}
+
+// Start starts the web server
+func (w *Server) Start() {
+	http.Handle("/", home.NewHandler())
+	http.Handle("/products", products.NewHandler(w.ps))
+	http.Handle("/configuration", configuration.NewHandler(w.config))
+	log.Println("Web server started at " + w.config.GetAddress())
+	log.Fatal(http.ListenAndServe(w.config.GetAddress(), nil))
+}

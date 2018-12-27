@@ -1,0 +1,4 @@
+.vscode
+
+cmd/apw/*
+!cmd/apw/main.go
