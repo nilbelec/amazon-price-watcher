@@ -132,7 +132,13 @@ func (r *ProductRepository) ListProducts() ([]model.Product, error) {
 		v = append(v, value)
 	}
 	sort.Slice(v, func(i, j int) bool {
-		return (v[i].Price < v[i].LastPrice && v[j].Price >= v[j].LastPrice) || v[i].Added.After(v[j].Added)
+		if v[i].Price < v[i].LastPrice && v[j].Price >= v[j].LastPrice {
+			return true
+		}
+		if v[j].Price < v[j].LastPrice && v[i].Price >= v[i].LastPrice {
+			return false
+		}
+		return v[i].Added.After(v[j].Added)
 	})
 	return v, nil
 }
