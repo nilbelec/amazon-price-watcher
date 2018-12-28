@@ -86,6 +86,9 @@
             font-size: 17px;
             color: #B12704;
         }
+        .product-price.product-price-down {
+            color: #008a00;
+        }
         .no-products-message{
             display: block;
             text-align: center;       
@@ -274,8 +277,14 @@
 
                             if (product.LastPrice !== product.Price) {
                                 var lastPrice = '- No stock -';
-                                if (product.LastPrice > 0)
+                                if (product.LastPrice > 0){
                                     lastPrice = product.Currency + " " + numeral(product.LastPrice).format('0,0.00');
+                                    if (product.LastPrice > product.Price) {
+                                        card.find('.product-price').addClass('product-price-down')
+                                    } else {
+                                        card.find('.product-price').addClass('product-price-up')
+                                    }
+                                }
                                 card.find('.product-last-price').text(lastPrice);
                             }
 
@@ -310,7 +319,7 @@
                         showError("Ups! There was an error while loading your products...");
                     })
                     .always(function () {
-                        timeout = setTimeout(loadProducts, 30000)
+                        //timeout = setTimeout(loadProducts, 30000)
                     })
 
             };
