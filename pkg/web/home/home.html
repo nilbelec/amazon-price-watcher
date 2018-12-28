@@ -21,6 +21,13 @@
             font-size: 14px;
             color: #111;
         }
+        .btn:focus,.btn:active:focus,.btn.active:focus,
+        .btn.focus,.btn:active.focus,.btn.active.focus {
+            outline: none;
+            outline: none !important;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+        }
         .btn-primary {
             background-color: #febd69;
             border-color: #febd69;
@@ -30,6 +37,11 @@
             font-size: 0.6em;
         }
         .btn-primary:hover,.btn-primary:focus,.btn-primary:active {
+            background-color: #f3a847 !important;
+            border-color: #febd69 !important;
+            color: #111 !important;
+        }
+        .btn-primary.disabled, .btn-primary:disabled {
             background-color: #f3a847 !important;
             border-color: #febd69 !important;
             color: #111 !important;
@@ -103,7 +115,7 @@
                 </div>
             </div>
             <div class="col-xs-auto ml-2">
-                <button data-toggle="modal" data-target="#configuration-modal" title="Configure the application settings"
+                <button data-toggle="modal" data-target="#configuration-modal"
                     class="btn btn-primary" type="button" id="show-configuration">
                     <i class="fa fa-cog"></i>
                 </button>
@@ -138,7 +150,7 @@
                     </div>
                     <div class="col"></div>
                     <div class="col-xs-auto align-self-end pt-3">
-                        <span data-toggle="tooltip" title="Last price" class="product-last-price"></span>
+                        <span data-toggle="tooltip" title="Previous price" class="product-last-price"></span>
                         <span data-toggle="tooltip" title="Current price" class="product-price"></span>
                     </div>
                 </div>
@@ -243,6 +255,7 @@
                     clearTimeout(timeout)
                 $.getJSON(productsURL)
                     .done(function (response) {
+                        $('#products-container [data-toggle="tooltip"]').tooltip('dispose');
                         $('#products-container').empty();
                         if (!response.length) {
                             $('#products-container').append("<span class='no-products-message mx-auto mt-3'>You are not watching any product...</span>")
@@ -317,6 +330,12 @@
                     timeout: 5000
                 }).show();
             };
+
+            $('#add-product-url').on('keyup', function(e){
+                if (e.which == 13) {
+                    $('#add-product-btn').trigger('click');
+                }
+            });
 
             $('#add-product-btn').on('click', function () {
                 var productUrl = $('#add-product-url').val();
