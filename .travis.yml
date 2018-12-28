@@ -1,18 +1,28 @@
 language: go
-
-go: 
-  - 1.11.x
-
+go:
+- 1.11.x
 before_install:
-  - go get github.com/mitchellh/gox
-  - go get github.com/gobuffalo/packr/packr
-  - packr
-
+- go get github.com/mitchellh/gox
+- go get github.com/gobuffalo/packr/packr
+- packr
 install:
-  - go get -t -v ./...
-
+- go get -t -v ./...
 script:
-  - diff -u <(echo -n) <(gofmt -d .)
-  - go vet $(go list ./... | grep -v /vendor/)
-  - go test -v -race ./...
-  - gox -os="linux darwin windows" -arch="amd64" -output="apw.{{.OS}}.{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
+- diff -u <(echo -n) <(gofmt -d .)
+- go vet $(go list ./... | grep -v /vendor/)
+- go test -v -race ./...
+- gox -osarch="linux/arm linux/amd64 windows/amd64 darwin/amd64" -output="apw.{{.OS}}.{{.Arch}}" -ldflags
+  "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: ap2xhYGuqxv3WN4C2PkoH4gkstKi4HK14fahvetu+jIwnj/IOQ1B2EmpUrOGLXS0ZX+nnYsk1EBZeDdWK46vfwyyxBm224LRUnkt3sUK7kj1R6/eQmwzOX+Qmkx294AJQ/FLDE/iNy62KWKb/eWcP3rBrXqsMjZ88BsK+IUxI6Ivo77oCvrvD3dSyzTDBriwy1buWoP+AkUD7oU9bwpT+6iBRvHNLtiyoVUlKBGuJTYKsWJfw9aKFGgGk+DIXidZnPGgE53RP3ETSbvjCdrfLDmG+ZAOZbbYcv4IlSz3oFkK9wQCHxBSCGcFi2/wKeX/YpWcAEq/C507UCGUbiIo4p/D+Kwpk8VnJzocfb1AE4rA3ktNPwpNBRcFwcdVcZ1GCOqkqQNXiqH9MBOzU6cPhv5C/CgDEcA7hOA5gOT47xlLO79eOHcFyHyibRf7tTlMMoCZj3+pit/nwYEPobdtZh0Tw67Peqqhi65Z69Zb/mIphNqKL0LCPVEmkjHG/uIfeuxMNFI93/UZk5zHHcIwEx5Cpq5t8FUH2jjM/jxAqq7kdVPmX+iUzITBDXIDxssFVDV2FH4e4/xe4I3Ll6wYE8Xl/tacbV8/bfaBJytKPbOxEHyHcbGPCZcQyHizmUzgSj9xOgHr+JM50GYvXJcDKgD8iGmlVI0AiRQEhnRGJQ4=
+  file:
+  - apw.windows.amd64.exe
+  - apw.darwin.amd64
+  - apw.linux.amd64
+  - apw.linux.arm
+  on:
+    tags: true
+    repo: nilbelec/amazon-price-watcher
