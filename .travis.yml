@@ -11,14 +11,14 @@ script:
 - diff -u <(echo -n) <(gofmt -d .)
 - go vet $(go list ./... | grep -v /vendor/)
 - go test -v -race ./...
-- gox -osarch="linux/arm linux/amd64 windows/amd64 darwin/amd64" -output="apw.{{.OS}}.{{.Arch}}" -ldflags
-  "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
+- gox -osarch="linux/arm linux/amd64 windows/amd64 darwin/amd64" -output="apw.{{.OS}}.{{.Arch}}"
+  -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: ap2xhYGuqxv3WN4C2PkoH4gkstKi4HK14fahvetu+jIwnj/IOQ1B2EmpUrOGLXS0ZX+nnYsk1EBZeDdWK46vfwyyxBm224LRUnkt3sUK7kj1R6/eQmwzOX+Qmkx294AJQ/FLDE/iNy62KWKb/eWcP3rBrXqsMjZ88BsK+IUxI6Ivo77oCvrvD3dSyzTDBriwy1buWoP+AkUD7oU9bwpT+6iBRvHNLtiyoVUlKBGuJTYKsWJfw9aKFGgGk+DIXidZnPGgE53RP3ETSbvjCdrfLDmG+ZAOZbbYcv4IlSz3oFkK9wQCHxBSCGcFi2/wKeX/YpWcAEq/C507UCGUbiIo4p/D+Kwpk8VnJzocfb1AE4rA3ktNPwpNBRcFwcdVcZ1GCOqkqQNXiqH9MBOzU6cPhv5C/CgDEcA7hOA5gOT47xlLO79eOHcFyHyibRf7tTlMMoCZj3+pit/nwYEPobdtZh0Tw67Peqqhi65Z69Zb/mIphNqKL0LCPVEmkjHG/uIfeuxMNFI93/UZk5zHHcIwEx5Cpq5t8FUH2jjM/jxAqq7kdVPmX+iUzITBDXIDxssFVDV2FH4e4/xe4I3Ll6wYE8Xl/tacbV8/bfaBJytKPbOxEHyHcbGPCZcQyHizmUzgSj9xOgHr+JM50GYvXJcDKgD8iGmlVI0AiRQEhnRGJQ4=
-  file:
+    secure: Zc1ktPT779ZrsI66Lb7ry+F21WdtItCPXO6gktWXB9FQub350buG5N1nGq2LoMT/nKtuYi55W32fRCEudhDwtf18hk9f2u+431RbEtBF8EkmDc+TMBKNujn/Ktmr3VTLRxY3awEjYHn7iyOY3Y5c1/19/oSLnBfrK0tYs2nba4L7g6BtpINjBtQ6VqNyQAi0StaDeoOlGmccmMr01RFpvbANiH6tbGMGJMW/+fBVTi20qdmsp3n84wEn9uVZQyYBT6W80ktkYqKnUs+QlDNL4HyKHvHLOVPMsk98MMcqvlnE/3HucYVjuKGa9qYXABSB5u0rZTFd1Q8BKe1sWreyYTQ0bqo+Dos6csC819y+l5L+0lwtul4lqkwXdpCT/g1jjsJTekUqV+Y6rcAZ19IjUwD+T5EylXeGiu3V8e68QLiWBozJVDmvMDPQa41x69iBC+kBKlRviSX0IP9NQiWBmtL83BjCAnBW4TUve1q6aHAa1Nu5Iy5EdeXIO6JZ26g7sKHCx3oD0FVPdJjgf56ggfYPuZcYlaR1eBj1SeJBS59RwCXyfgbUolYb15cI1t7awnnN5FVMA3yfsMdeE5UpYL1zg4M0T+HRs4QasDFZeAp9AMzBuTemAy3zQfFFfd1Gge5G+1b/7KIOdop+7QHpEWRepyTtgi9vHDHQYdv9gBI=
+  file: 
   - apw.windows.amd64.exe
   - apw.darwin.amd64
   - apw.linux.amd64
