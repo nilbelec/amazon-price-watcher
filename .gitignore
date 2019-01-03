@@ -2,3 +2,4 @@
 
 cmd/apw/*
 !cmd/apw/main.go
+!cmd/apw/version.go

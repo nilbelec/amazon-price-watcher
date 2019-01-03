@@ -32,6 +32,6 @@ func main() {
 	finder := crawler.NewProductCrawler()
 	ps := services.NewProductService(repo, finder, config, notifiers)
 
-	web := web.NewServer(ps, config)
+	web := web.NewServer(ps, config, version)
 	web.Start()
 }
