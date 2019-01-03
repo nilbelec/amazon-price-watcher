@@ -15,7 +15,7 @@ type Data struct {
 	TelegramChatIDs                  []int64 `json:"telegram_chat_ids"`
 }
 
-// Handler the home handler
+// Handler handles the configurations requests
 type Handler struct {
 	config *configuration.File
 }

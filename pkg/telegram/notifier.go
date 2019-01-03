@@ -27,7 +27,7 @@ func New(config BotConfig) (n *Notifier, err error) {
 
 // NotifyProductChange send a telegram bot message notifying a product change
 func (n *Notifier) NotifyProductChange(product model.Product) {
-	if !n.IsEnabled() || !product.Changed() {
+	if !n.IsConfigured() || !product.ShouldSendAnyNotification() {
 		return
 	}
 	bot, err := tgbotapi.NewBotAPI(n.config.GetBotToken())
@@ -36,26 +36,50 @@ func (n *Notifier) NotifyProductChange(product model.Product) {
 		return
 	}
 
-	var text string
-	if product.PriceHasDecreased() {
-		text = fmt.Sprintf("Cool! '%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency)
-	} else if product.PriceHasIncrecreased() {
-		text = fmt.Sprintf("Oh no! '%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency)
-	} else {
-		return
-	}
-
-	for _, chatID := range n.config.GetChatIDs() {
-		msg := tgbotapi.NewMessage(chatID, text)
-		_, err := bot.Send(msg)
-		if err != nil {
-			log.Printf("Error sending message to chatID %d: %s\n", chatID, err.Error())
-		}
-	}
+	messages := prepareNotificationMessages(product)
+	sendNotifications(bot, messages, n.config.GetChatIDs())
 	return
 }
 
-// IsEnabled tells if the Telegram Notifier is enabled
-func (n *Notifier) IsEnabled() bool {
+func prepareNotificationMessages(product model.Product) []string {
+	messages := make([]string, 0)
+	if product.ShouldSendPriceDecreasesNotification() {
+		messages = append(messages, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency))
+	}
+	if product.ShouldSendPriceIncreasesNotification() {
+		messages = append(messages, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency))
+	}
+	if product.ShouldSendPriceBelowsNotification() {
+		messages = append(messages, fmt.Sprintf("Cool! '%s' is below %.2f %s! It's now at %.2f %s (before: %.2f %s)", product.Title, product.Notifications.PriceBelows, product.Currency, product.Price, product.Currency, product.LastPrice, product.Currency))
+	}
+	if product.ShouldSendPriceOverNotification() {
+		messages = append(messages, fmt.Sprintf("'%s' is over %.2f %s... It's at %.2f %s (before: %.2f %s)", product.Title, product.Notifications.PriceOver, product.Currency, product.Price, product.Currency, product.LastPrice, product.Currency))
+	}
+	if product.ShouldSendBackInStockNotification() {
+		messages = append(messages, fmt.Sprintf("'%s' is back in stock! It's now at %.2f %s", product.Title, product.Price, product.Currency))
+	}
+	if product.ShouldSendOutOfStockNotification() {
+		messages = append(messages, fmt.Sprintf("'%s' is out of stock... Before it was at %.2f %s ", product.Title, product.LastPrice, product.Currency))
+	}
+	return messages
+}
+
+func sendNotifications(bot *tgbotapi.BotAPI, messages []string, chatIDs []int64) {
+	if len(messages) == 0 || len(chatIDs) == 0 {
+		return
+	}
+	for _, text := range messages {
+		for _, chatID := range chatIDs {
+			msg := tgbotapi.NewMessage(chatID, text)
+			_, err := bot.Send(msg)
+			if err != nil {
+				log.Printf("Error sending message to chatID %d: %s\n", chatID, err.Error())
+			}
+		}
+	}
+}
+
+// IsConfigured tells if the Telegram Notifier is configured
+func (n *Notifier) IsConfigured() bool {
 	return n.config.GetBotToken() != "" && len(n.config.GetChatIDs()) != 0
 }

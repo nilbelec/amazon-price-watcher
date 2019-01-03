@@ -8,7 +8,6 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
 
@@ -60,6 +59,9 @@
             bottom: -12px;
             margin-right: -34px;
         }
+        .form-check > label{
+            cursor: pointer;
+        }
         .bg-amazon {
             background-color: #232f3e;
         }
@@ -70,15 +72,16 @@
         .product:last-child {
             border-bottom: none;
         }
-        .product-link {
+        .product-title {
             color: #0066c0;
             text-decoration: none;
+            font-weight: bolder;
         }
-        .product-link:hover {
+        .product-title:hover {
             color: #c45500 !important;
             text-decoration: none !important;
         }
-        .product-last-price {
+        .product .product-last-price {
             text-decoration: line-through;
             color: #555;
         }
@@ -86,7 +89,7 @@
             font-size: 17px;
             color: #B12704;
         }
-        .product-price.product-price-down {
+        .product .product-price.product-price-down {
             color: #008a00;
         }
         .no-products-message{
@@ -98,31 +101,26 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-amazon">
+    <nav class="navbar navbar-expand navbar-amazon">
         <div class="container px-2">
             <span class="navbar-brand d-none d-sm-block">
                 <img height="36px" src="data:image/png;base64,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">
                 <span class="brand-text">Price Watcher</span>
             </span>
-            <div class="col p-0">
-                <div class="form-inline my-2 my-lg-0 w-100">
-                    <div class="input-group w-100">
-                        <input id="add-product-url" type="text" class="form-control" placeholder="Amazon product URL">
-                        <div class="input-group-append">
-                            <button data-toggle="tooltip" title="Watchs a new product using its Amazon URL" class="btn btn-primary"
-                                type="button" id="add-product-btn">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
+            <form class="mx-2 my-auto d-inline w-100">
+                <div class="input-group w-100">
+                    <input id="add-product-url" type="text" class="form-control" placeholder="Amazon product URL">
+                    <div class="input-group-append">
+                        <button data-toggle="tooltip" title="Watchs a new product using its Amazon URL" class="btn btn-primary"
+                            type="button" id="add-product-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="col-xs-auto ml-2">
-                <button data-toggle="modal" data-target="#configuration-modal"
-                    class="btn btn-primary" type="button" id="show-configuration">
-                    <i class="fa fa-cog"></i>
-                </button>
-            </div>
+            </form>
+            <button data-toggle="modal" data-target="#configuration-modal" class="btn btn-primary" type="button" id="show-configuration">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
     </nav>
 
@@ -138,21 +136,24 @@
                 <div class="row h-100 no-gutters">
                     <div class="col">
                         <a href="#" data-toggle="tooltip" data-toggle="tooltip" title="Open in Amazon" target="_blank"
-                            role="button" class="product-link">
-                            <strong class="product-title"></strong>
+                            role="button" class="product-title">
                         </a>
                     </div>
                     <div class="col-auto pl-2">
-                        <button data-toggle="tooltip" data-toggle="tooltip" title="Remove this product" class="btn btn-sm btn-danger remove-product-btn">
-                            <i class="fa fa-trash"></i>
+                        <button data-toggle="tooltip" data-toggle="tooltip" title="Configure the notifications for this product"
+                            class="btn btn-sm btn-success configure-alerts-btn">
+                            <i class="fas fa-fw fa-bell"></i>
+                        </button>
+                        <button data-toggle="tooltip" data-toggle="tooltip" title="Remove this product" class="btn btn-sm btn-danger remove-product-btn ml-1">
+                            <i class="fas fa-fw fa-trash"></i>
                         </button>
                     </div>
                     <div class="w-100"></div>
-                    <div class="col-xs-auto align-self-end pt-3">
+                    <div class="col-auto align-self-end pt-3">
                         <small>Last update: <span class="product-last-update"></small>
                     </div>
                     <div class="col"></div>
-                    <div class="col-xs-auto align-self-end pt-3">
+                    <div class="col-auto align-self-end pt-3">
                         <span data-toggle="tooltip" title="Previous price" class="product-last-price"></span>
                         <span data-toggle="tooltip" title="Current price" class="product-price"></span>
                     </div>
@@ -161,59 +162,176 @@
         </div>
     </div>
 
+    <div class="modal fade" id="notifications-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="d-none d-lg-block col-1 px-2 align-self-center text-center">
+                                <img src="" class="img-fluid product-image" alt="Product image">
+                            </div>
+                            <div class="col px-2">
+                                <a href="#" data-toggle="tooltip" data-toggle="tooltip" title="Open in Amazon" target="_blank"
+                                    role="button" class="product-title">
+                                </a>
+                            </div>
+                            <div class="col-lg-auto px-2 align-self-end text-right">
+                                <span class="product-price"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <h6 class="mb-3">
+                            Notify me when
+                        </h6>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="price-belows-chk">
+                                    <label class="form-check-label" for="price-belows-chk">
+                                        the price gets at or below:
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-md-8">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text product-currency">EUR</span>
+                                    </div>
+                                    <input id="price-belows-input" min="0.01" step="0.01" max="65536" type="number"
+                                        class="form-control" disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="price-over-chk">
+                                    <label class="form-check-label" for="price-over-chk">
+                                        the price gets at or over:
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-md-8">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text product-currency">EUR</span>
+                                    </div>
+                                    <input id="price-over-input" min="0.01" step="0.01" max="65536" type="number" class="form-control"
+                                        disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" id="price-increases-chk">
+                                    <label class="form-check-label" for="price-increases-chk">
+                                        the price increases
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" id="price-decreases-chk">
+                                    <label class="form-check-label" for="price-decreases-chk">
+                                        the price decreases
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" id="out-stock-chk">
+                                    <label class="form-check-label" for="out-stock-chk">
+                                        gets out of stock
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row align-items-center">
+                            <div class="form-group col">
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" id="in-stock-chk">
+                                    <label class="form-check-label" for="in-stock-chk">
+                                        gets back in stock
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <small class="text-danger">Remember! You need to have Telegram configured to receive notifications</small>
+                    <button id="save-notifications-btn" type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="configuration-modal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-body">    
-                        <p class="bg-info text-white p-1">
-                            <i class="fa fa-sliders-h"></i>
-                            Global settings
-                        </p>                
-                        <div class="form-group row">
-                            <label for="config-port" class="col-md-4 col-form-label">Port</label>
-                            <div class="col-md-8">
-                                    <input type="number" min="1" max="65535" class="form-control" id="config-port" placeholder="Enter the application port" step="1">
-                                    <small class="form-text text-danger">You'll need to restart the application for this change to take effect.</small>
-                            </div>
+                <div class="modal-body">
+                    <p class="bg-info text-white p-1">
+                        <i class="fas fa-sliders-h"></i>
+                        Global settings
+                    </p>
+                    <div class="form-group row">
+                        <label for="config-port" class="col-md-4 col-form-label">Port</label>
+                        <div class="col-md-8">
+                            <input type="number" min="1" max="65535" class="form-control" id="config-port" placeholder="Enter the application port"
+                                step="1">
+                            <small class="form-text text-danger">You'll need to restart the application for this change
+                                to take effect.</small>
                         </div>
-                        <div class="form-group row">
-                            <label for="config-interval" class="col-md-4 col-form-label">Refresh interval in minutes</label>
-                            <div class="col-md-8">
-                                    <input type="number" min="1" max="360" class="form-control" id="config-interval" placeholder="Enter the refresh interval in minutes" step="1">
-                            </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="config-interval" class="col-md-4 col-form-label">Refresh interval in minutes</label>
+                        <div class="col-md-8">
+                            <input type="number" min="1" max="360" class="form-control" id="config-interval"
+                                placeholder="Enter the refresh interval in minutes" step="1">
                         </div>
-                        <p class="bg-info text-white p-1">
-                            <i class="fab fa-telegram"></i>
-                            Telegram notifications
-                        </p>
-                        <div class="form-group row">
-                            <label for="config-tg-token" class="col-md-4 col-form-label">
-                                Telegram Bot TOKEN
-                            </label>
-                            <div class="col-md-8">
-                                    <input type="text"  class="form-control" id="config-tg-token" placeholder="Enter your Telegram Bot TOKEN">
-                                    <small class="form-text text-muted">
-                                            You need to set up a Telegram Bot and get its <a target="_blank" href="https://core.telegram.org/bots/api#authorizing-your-bot">TOKEN</a>.
-                                    </small>
-                            </div>
+                    </div>
+                    <p class="bg-info text-white p-1">
+                        <i class="fab fa-telegram"></i>
+                        Telegram notifications
+                    </p>
+                    <div class="form-group row">
+                        <label for="config-tg-token" class="col-md-4 col-form-label">
+                            Telegram Bot TOKEN
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="config-tg-token" placeholder="Enter your Telegram Bot TOKEN">
+                            <small class="form-text text-muted">
+                                You need to set up a Telegram Bot and get its <a target="_blank" href="https://core.telegram.org/bots/api#authorizing-your-bot">TOKEN</a>.
+                            </small>
                         </div>
-                        <div class="form-group row">
-                            <label for="config-tg-chatids" class="col-md-4 col-form-label">Telegram receivers identifiers</label>
-                            <div class="col-md-8">
-                                    <input type="text"  class="form-control" id="config-tg-chatids" placeholder="Enter your Telegram Chat IDs">
-                                    <small class="form-text text-muted">
-                                            To get the chat_id for your username, you need to send a message to your Bot first. 
-                                            <a target="_blank" href="https://stackoverflow.com/a/50736131">
-                                                HELP<i class="fab fa-stack-overflow"></i>
-                                            </a>
-                                            <br/> You can introduce multiple receivers using its chat_id separated by spaces
-                                    </small>
-                            </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="config-tg-chatids" class="col-md-4 col-form-label">Telegram receivers identifiers</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="config-tg-chatids" placeholder="Enter your Telegram Chat IDs">
+                            <small class="form-text text-muted">
+                                To get the chat_id for your username, you need to send a message to your Bot first.
+                                <a target="_blank" href="https://stackoverflow.com/a/50736131">
+                                    HELP<i class="fab fa-stack-overflow"></i>
+                                </a>
+                                <br /> You can introduce multiple receivers using its chat_id separated by spaces
+                            </small>
                         </div>
-                        <button id ="telegram-test-btn" class="btn btn-sm btn-info">
-                            Test it!
-                            <i class="fab fa-telegram-plane"></i>
-                        </button>
+                    </div>
+                    <button id="telegram-test-btn" class="btn btn-sm btn-info">
+                        Test it!
+                        <i class="fab fa-telegram-plane"></i>
+                    </button>
                 </div>
                 <div class="modal-footer">
                     <button id="save-configuration-btn" type="button" class="btn btn-primary">Save changes</button>
@@ -231,6 +349,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous"></script>
     <script>
         numeral.register('locale', 'es', {
             delimiters: {
@@ -269,7 +388,7 @@
                             var card = $(template);
                             card.find('.product-image').prop('src', product.ImageURL);
                             card.find('.product-title').text(product.Title);
-                            card.find('.product-link').prop("href", product.URL);
+                            card.find('.product-title').prop("href", product.URL);
                             var price = '- No stock -';
                             if (product.Price > 0)
                                 price = product.Currency + " " + numeral(product.Price).format('0,0.00');
@@ -277,7 +396,7 @@
 
                             if (product.LastPrice !== product.Price) {
                                 var lastPrice = '- No stock -';
-                                if (product.LastPrice > 0){
+                                if (product.LastPrice > 0) {
                                     lastPrice = product.Currency + " " + numeral(product.LastPrice).format('0,0.00');
                                     if (product.LastPrice > product.Price) {
                                         card.find('.product-price').addClass('product-price-down')
@@ -312,6 +431,45 @@
                                     });
                             })
 
+                            if (!product.notifications.total) {
+                                card.find('.configure-alerts-btn').toggleClass('btn-primary btn-success');
+                                card.find('.configure-alerts-btn i.fas').toggleClass('fa-bell fa-bell-slash');
+                            } else {
+                                card.find('.configure-alerts-btn').prop("title", "You have " + product.notifications.total + " notifications configured for this product");
+                            }
+
+                            card.find('.configure-alerts-btn').data("product", product).on('click', function () {
+                                var $btn = $(this);
+                                $btn.tooltip('hide');
+                                var p = $btn.data('product');
+                                if (p.Price > 0) {
+                                    $('#notifications-modal .product-price').text(p.Currency + " " + numeral(p.Price).format('0,0.00'));
+                                } else {
+                                    $('#notifications-modal .product-price').text("-- No Stock --");
+                                }
+                                $('#notifications-modal .product-title').prop("href", p.URL);
+                                $('#notifications-modal .product-title').text(p.Title);
+                                $('#notifications-modal .product-image').prop("src", p.ImageURL);
+                                $('#notifications-modal .product-currency').text(p.Currency);
+
+                                $('#in-stock-chk').prop('checked', p.notifications.back_in_stock);
+                                $('#out-stock-chk').prop('checked', p.notifications.out_of_stock);                                    
+                                
+                                $('#price-increases-chk').prop('checked', p.notifications.price_increases);                                    
+                                $('#price-decreases-chk').prop('checked', p.notifications.price_decreases);                                    
+                                
+                                $('#price-belows-chk').prop('checked', p.notifications.price_below > 0);
+                                $('#price-belows-input').prop('disabled', p.notifications.price_below === 0);
+                                $('#price-belows-input').val(p.notifications.price_below > 0 ? p.notifications.price_below : "");
+                                
+                                $('#price-over-chk').prop('checked', p.notifications.price_over > 0);
+                                $('#price-over-input').prop('disabled', p.notifications.price_over === 0);
+                                $('#price-over-input').val(p.notifications.price_over > 0 ? p.notifications.price_over : "");
+
+                                $('#notifications-modal').data('product', p);
+                                $('#notifications-modal').modal('show');
+                            })
+
                             card.find('[data-toggle="tooltip"]').tooltip(TOOLTIP_DEFAULTS)
                         }
                     })
@@ -319,15 +477,86 @@
                         showError("Ups! There was an error while loading your products...");
                     })
                     .always(function () {
-                        //timeout = setTimeout(loadProducts, 30000)
+                        timeout = setTimeout(loadProducts, 30000)
                     })
-
             };
+
+            $('#price-belows-chk').on('change', function(){
+                $('#price-belows-input').prop('disabled', !$('#price-belows-chk').is(":checked"));
+            });
+
+            $('#price-over-chk').on('change', function(){
+                $('#price-over-input').prop('disabled', !$('#price-over-chk').is(":checked"));
+            });
+
+            $('#save-notifications-btn').on('click', function (){
+                $('#notifications-modal .is-invalid').removeClass('is-invalid');
+                
+                var p = $('#notifications-modal').data('product');
+                if (!p || !p.URL) {
+                    showError("There was a problem getting the product info. Please reload the page, and try again.")
+                    return;
+                }
+                
+
+                var invalid = false;
+                var priceBelow = 0.0;
+                if ($('#price-belows-chk').is(':checked')) {
+                    var value = $('#price-belows-input').val();
+                    if (value === "" || isNaN(value) || Number(value) <= 0){
+                        $('#price-belows-input').addClass('is-invalid');
+                        invalid = true;
+                    } else {
+                        priceBelow = Number(value);
+                    }
+                }
+                
+                var priceOver = 0.0;
+                if ($('#price-over-chk').is(':checked')) {
+                    var value = $('#price-over-input').val();
+                    if (value === "" || isNaN(value) || Number(value) <= 0){
+                        $('#price-over-input').addClass('is-invalid');
+                        invalid = true;
+                    } else {
+                        priceOver = Number(value);
+                    }
+                }
+
+                if (invalid) return;
+
+                var priceIncreases = $('#price-increases-chk').is(':checked');
+                var priceDecreases = $('#price-decreases-chk').is(':checked');
+                var outOfStock = $('#out-stock-chk').is(':checked');
+                var inStock = $('#in-stock-chk').is(':checked');
+
+                var data = {
+                    price_below : priceBelow,
+                    price_over: priceOver,
+                    back_in_stock : inStock,
+                    out_of_stock: outOfStock,
+                    price_increases: priceIncreases,
+                    price_decreases: priceDecreases
+                }
+                var url = "/notifications?url=" + encodeURIComponent(p.URL);
+                $('#save-notifications-btn, #notifications-modal input').prop('disabled', true);
+                $.post(url, JSON.stringify(data))
+                    .done(function () {
+                        showSuccess('Notifications saved');
+                        loadProducts();
+                        $('#notifications-modal').modal('hide');
+                    })
+                    .fail(function (xhr) {
+                        showError(xhr.responseText);
+                    })
+                    .always(function () {
+                        $('#save-notifications-btn, #notifications-modal input').prop('disabled', false);
+                    })
+            });
 
             var showError = function (message) {
                 new Noty({
                     type: 'error',
-                    text: '<i class="fa fa-exclamation-triangle"></i> ' + message,
+                    text: '<i class="fas fa-exclamation-triangle"></i> ' + message,
                     timeout: 5000
                 }).show();
             };
@@ -335,13 +564,14 @@
             var showSuccess = function (message) {
                 new Noty({
                     type: 'success',
-                    text: '<i class="fa fa-check-square"></i> ' + message,
+                    text: '<i class="fas fa-check-square"></i> ' + message,
                     timeout: 5000
                 }).show();
             };
 
-            $('#add-product-url').on('keyup', function(e){
+            $('#add-product-url').on('keyup keypress', function (e) {
                 if (e.which == 13) {
+                    e.preventDefault();
                     $('#add-product-btn').trigger('click');
                 }
             });
@@ -368,47 +598,47 @@
                     })
             });
 
-            $('#configuration-modal').on('show.modal.bs', function(){
+            $('#configuration-modal').on('show.modal.bs', function () {
                 $('#configuration-modal input, #save-configuration-btn').prop('disabled', true);
                 $.getJSON('/configuration')
-                .done(function(response){
-                    $('#configuration-modal #config-port').val(response.port);
-                    $('#configuration-modal #config-interval').val(response.refresh_interval);
-                    $('#configuration-modal #config-tg-token').val(response.telegram_bot_token);
-                    $('#configuration-modal #config-tg-chatids').val(response.telegram_chat_ids.join(' '));
-                    $('#configuration-modal input, #save-configuration-btn').prop('disabled', false);
-                })
-                .fail(function(){
-                    showError('Cannot get current configuration...')
-                })
+                    .done(function (response) {
+                        $('#config-port').val(response.port);
+                        $('#config-interval').val(response.refresh_interval);
+                        $('#config-tg-token').val(response.telegram_bot_token);
+                        $('#config-tg-chatids').val(response.telegram_chat_ids.join(' '));
+                        $('#configuration-modal input, #save-configuration-btn').prop('disabled', false);
+                    })
+                    .fail(function () {
+                        showError('Cannot get current configuration...')
+                    })
             })
 
-            $('#save-configuration-btn').on('click', function(){
+            $('#save-configuration-btn').on('click', function () {
                 $('#configuration-modal .is-invalid').removeClass('is-invalid');
                 var invalid = false;
 
-                var port = $('#configuration-modal #config-port').val().trim();
-                if (port === "" || isNaN(Number(port)) || Number(port) < 1 || Number(port)> 65536 || !Number.isInteger(Number(port))) {
-                    $('#configuration-modal #config-port').addClass('is-invalid');
+                var port = $('#config-port').val().trim();
+                if (port === "" || isNaN(Number(port)) || Number(port) < 1 || Number(port) > 65536 || !Number.isInteger(Number(port))) {
+                    $('#config-port').addClass('is-invalid');
                     invalid = true;
                 }
 
-                var interval = $('#configuration-modal #config-interval').val().trim();
-                if (interval === "" || isNaN(Number(interval)) || Number(interval) < 1 || Number(interval)> 360 || !Number.isInteger(Number(interval))) {
-                    $('#configuration-modal #config-interval').addClass('is-invalid');
+                var interval = $('#config-interval').val().trim();
+                if (interval === "" || isNaN(Number(interval)) || Number(interval) < 1 || Number(interval) > 360 || !Number.isInteger(Number(interval))) {
+                    $('#config-interval').addClass('is-invalid');
                     invalid = true;
                 }
 
-                var token = $('#configuration-modal #config-tg-token').val().trim();
+                var token = $('#config-tg-token').val().trim();
 
-                var chatIdsInput = $('#configuration-modal #config-tg-chatids').val().trim();
+                var chatIdsInput = $('#config-tg-chatids').val().trim();
                 var chatIds = [];
                 if (chatIdsInput != "") {
                     var array = chatIdsInput.split(' ');
                     for (var k in array) {
                         var value = array[k].trim();
                         if (!value || isNaN(value)) {
-                            $('#configuration-modal #config-tg-chatids').addClass('is-invalid');
+                            $('#config-tg-chatids').addClass('is-invalid');
                             invalid = true;
                             break;
                         }
@@ -420,12 +650,12 @@
                 $('#configuration-modal input, #save-configuration-btn').prop('disabled', true);
 
                 var data = {
-                    port : Number(port),
+                    port: Number(port),
                     refresh_interval: Number(interval),
                     telegram_bot_token: token,
                     telegram_chat_ids: chatIds
                 }
-                $.post('/configuration', JSON.stringify(data) )
+                $.post('/configuration', JSON.stringify(data))
                     .done(function () {
                         showSuccess('Configuration saved');
                         $('#configuration-modal').modal('hide');
@@ -438,17 +668,17 @@
                     })
             })
 
-            $('#telegram-test-btn').on('click', function(){
+            $('#telegram-test-btn').on('click', function () {
 
                 $('#configuration-modal .is-invalid').removeClass('is-invalid');
                 var invalid = false;
 
-                var token = $('#configuration-modal #config-tg-token').val().trim();
+                var token = $('#config-tg-token').val().trim();
                 if (token === "") {
-                    $('#configuration-modal #config-tg-token').addClass('is-invalid');
+                    $('#config-tg-token').addClass('is-invalid');
                     invalid = true;
                 }
-                var chatIdsInput = $('#configuration-modal #config-tg-chatids').val().trim();
+                var chatIdsInput = $('#config-tg-chatids').val().trim();
                 var ids = chatIdsInput.split(' ');
 
                 if (invalid)
@@ -460,17 +690,17 @@
                     var chatId = ids[k]
                     var url = 'https://api.telegram.org/bot' + token + '/sendMessage';
 
-                    $.post(url, { 'chat_id' : chatId, 'text' : text })
-                    .done(function(r){
-                        showSuccess('Telegram message for user "' + r.result.chat.first_name + '" (ID : ' + r.result.chat.id + ') sent!');
-                    })
-                    .fail(function(xhr){
-                        var params = new URLSearchParams(this.data);
-                        showError('Telegram message for ' + params.get('chat_id') + ' failed!');
-                    })
-                    .always(function(){
-                        $btn.prop('disabled', false);
-                    })
+                    $.post(url, { 'chat_id': chatId, 'text': text })
+                        .done(function (r) {
+                            showSuccess('Telegram message for user "' + r.result.chat.first_name + '" (ID : ' + r.result.chat.id + ') sent!');
+                        })
+                        .fail(function (xhr) {
+                            var params = new URLSearchParams(this.data);
+                            showError('Telegram message for ' + params.get('chat_id') + ' failed!');
+                        })
+                        .always(function () {
+                            $btn.prop('disabled', false);
+                        })
                 }
             })
 

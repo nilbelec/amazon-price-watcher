@@ -70,12 +70,8 @@ func (pc *ProductCrawler) findByURL(inputURL string) (product model.Product, err
 }
 
 func findURL(doc *html.Node) (url string, err error) {
-	div := htmlquery.FindOne(doc, "html/head/link[@rel='canonical']")
-	if div == nil {
-		err = errors.New("URL element not found")
-		return
-	}
-	url = htmlquery.SelectAttr(div, "href")
+	node := htmlquery.FindOne(doc, "/html/head/link[@rel=\"canonical\"]")
+	url = strings.TrimSpace(htmlquery.SelectAttr(node, "href"))
 	if url == "" {
 		err = errors.New("URL href attr not found")
 	}
@@ -97,9 +93,15 @@ func findPriceAndCurrency(doc *html.Node) (price float64, currency string, err e
 		return
 	}
 	text = strings.TrimSpace(text)
-	textSplit := strings.Split(text, " ")
-	currency = textSplit[0]
-	priceString := textSplit[1]
+	var priceString string
+	if text[0] == '$' {
+		currency = string(text[0])
+		priceString = text[1:len(text)]
+	} else {
+		textSplit := strings.Split(text, " ")
+		currency = textSplit[0]
+		priceString = textSplit[1]
+	}
 	priceString = strings.Replace(priceString, ",", ".", -1)
 	price, err = strconv.ParseFloat(priceString, 32)
 	return

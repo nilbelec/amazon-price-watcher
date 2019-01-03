@@ -30,7 +30,7 @@ type ProductsConfiguration interface {
 //ProductNotifier handles the products notifications
 type ProductNotifier interface {
 	NotifyProductChange(product model.Product)
-	IsEnabled() bool
+	IsConfigured() bool
 }
 
 // ProductService struct
@@ -75,17 +75,14 @@ func (ps *ProductService) refreshProduct(product model.Product) {
 		log.Println("Unable to update product '" + product.URL + "': " + err.Error())
 		return
 	}
-	if product.Changed() {
+	if product.ShouldSendAnyNotification() {
 		ps.notifyProductChange(product)
 	}
 }
 
 func (ps *ProductService) notifyProductChange(product model.Product) {
-	if !product.Changed() {
-		return
-	}
 	for _, notifier := range ps.notifiers {
-		if notifier.IsEnabled() {
+		if notifier.IsConfigured() {
 			notifier.NotifyProductChange(product)
 		}
 	}
@@ -101,6 +98,20 @@ func (ps *ProductService) AddProductByURL(url string) (product model.Product, er
 	product.LastPrice = product.Price
 	err = ps.repo.AddProduct(product)
 	return
+}
+
+// UpdateProductNotifications updates the product notifications
+func (ps *ProductService) UpdateProductNotifications(url string, notifications model.Notifications) (err error) {
+	product, err := ps.repo.GetProductByURL(url)
+	if err != nil {
+		return err
+	}
+	product.Notifications = notifications
+	err = ps.repo.UpdateProduct(product)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // DeleteProductByURL deletes a product by its URL

@@ -7,7 +7,7 @@ import (
 	"github.com/nilbelec/amazon-price-watcher/pkg/services"
 )
 
-// Handler the home handler
+// Handler handles the products requests
 type Handler struct {
 	ps *services.ProductService
 }

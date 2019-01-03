@@ -11,7 +11,7 @@ import (
 type View struct {
 }
 
-// Handler the home handler
+// Handler handles the home requests
 type Handler struct {
 	box packr.Box
 }
