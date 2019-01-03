@@ -8,6 +8,8 @@ before_install:
 install:
 - go get -t -v ./...
 script:
+- export GIT_VERSION=`git describe --tags`
+- printf "package main\n\nconst version = \"%s\"\n" "$GIT_VERSION" > cmd/apw/version.go
 - diff -u <(echo -n) <(gofmt -d .)
 - go vet $(go list ./... | grep -v /vendor/)
 - go test -v -race ./...
