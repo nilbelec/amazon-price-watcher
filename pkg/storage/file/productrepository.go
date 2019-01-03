@@ -75,7 +75,7 @@ func (r *ProductRepository) AddProduct(product model.Product) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if _, ok := r.products[product.URL]; ok {
-		return errors.New("Product already exists")
+		return errors.New("That product is already on your watchlist")
 	}
 	r.products[product.URL] = product
 	err := r.saveProducts()
@@ -92,7 +92,7 @@ func (r *ProductRepository) DeleteProductByURL(url string) (product model.Produc
 	defer mutex.Unlock()
 	product, ok := r.products[url]
 	if !ok {
-		err = errors.New("Product doesnt exist")
+		err = errors.New("That product is not on your watchlist")
 		return
 	}
 	delete(r.products, url)
@@ -111,14 +111,14 @@ func (r *ProductRepository) UpdateProduct(product model.Product) error {
 	defer mutex.Unlock()
 	old, ok := r.products[product.URL]
 	if !ok {
-		return errors.New("Product is not stored")
+		return errors.New("That product is not on your watchlist")
 	}
 	product.Added = old.Added
 	r.products[product.URL] = product
 	err := r.saveProducts()
 	if err != nil {
 		r.products[product.URL] = old
-		return errors.New("Error saving products: " + err.Error())
+		return errors.New("Error updating the product: " + err.Error())
 	}
 	return nil
 }
@@ -149,7 +149,7 @@ func (r *ProductRepository) GetProductByURL(url string) (product model.Product, 
 	defer mutex.Unlock()
 	product, ok := r.products[url]
 	if !ok {
-		err = errors.New("Product is not stored")
+		err = errors.New("That product is not on your watchlist")
 	}
 	return
 }

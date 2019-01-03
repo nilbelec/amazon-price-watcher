@@ -1,7 +1,11 @@
 package crawler
 
 import (
+	"crypto/tls"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -22,36 +26,34 @@ func NewProductCrawler() *ProductCrawler {
 
 // FindByURL finds Product by Amazon URL
 func (pc *ProductCrawler) FindByURL(inputURL string) (product model.Product, err error) {
-	for i := 0; i < 3; i++ {
-		product, err = pc.findByURL(inputURL)
-		if err != nil {
-			continue
-		}
-		return
-	}
-	return
-}
-
-func (pc *ProductCrawler) findByURL(inputURL string) (product model.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
 		}
 	}()
-	doc, err := htmlquery.LoadURL(inputURL)
+	_, err = url.ParseRequestURI(inputURL)
 	if err != nil {
+		err = errors.New("That doesn't seem like a valid URL")
+		return
+	}
+	doc, err := loadURL(inputURL)
+	if err != nil {
+		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	url, err := findURL(doc)
 	if err != nil {
+		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	title, err := findTitle(doc)
 	if err != nil {
+		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	imageURL, err := findImageURL(doc)
 	if err != nil {
+		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	price, currency, _ := findPriceAndCurrency(doc)
@@ -67,6 +69,41 @@ func (pc *ProductCrawler) findByURL(inputURL string) (product model.Product, err
 		Currency:   currency,
 		LastUpdate: time.Now()}
 	return
+}
+
+func loadURL(url string) (*html.Node, error) {
+	resp, err := doRequest(url)
+	if err != nil {
+		return nil, errors.New("Error while requesting the page: " + err.Error())
+	}
+	return parseResponse(resp)
+}
+
+func parseResponse(resp *http.Response) (*html.Node, error) {
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	textBody := string(body)
+	return html.Parse(strings.NewReader(textBody))
+}
+
+func doRequest(url string) (*http.Response, error) {
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	transport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+	client := http.Client{Transport: transport}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func findURL(doc *html.Node) (url string, err error) {
@@ -130,7 +167,7 @@ func findImageURL(doc *html.Node) (imageURL string, err error) {
 	}
 	imageURL = htmlquery.SelectAttr(imgEl, "src")
 	if imageURL == "" {
-		err = errors.New("Price text not found")
+		err = errors.New("Image src not found")
 	}
 	return
 }
