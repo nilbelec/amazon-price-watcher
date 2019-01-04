@@ -1,4 +1,4 @@
-package crawler
+package amazon
 
 import (
 	"crypto/tls"
@@ -12,21 +12,21 @@ import (
 	"time"
 
 	"github.com/antchfx/htmlquery"
-	"github.com/nilbelec/amazon-price-watcher/pkg/model"
+	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 	"golang.org/x/net/html"
 )
 
-// AmazonCrawler Amazon crawler
-type AmazonCrawler struct {
+// Crawler is an Amazon crawler
+type Crawler struct {
 }
 
 // New creates a new Amazon product crawler
-func New() *AmazonCrawler {
-	return &AmazonCrawler{}
+func New() *Crawler {
+	return &Crawler{}
 }
 
 // FindByURL finds Product by Amazon URL
-func (pc *AmazonCrawler) FindByURL(inputURL string) (product model.Product, err error) {
+func (pc *Crawler) FindByURL(inputURL string) (p product.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
@@ -64,7 +64,7 @@ func (pc *AmazonCrawler) FindByURL(inputURL string) (product model.Product, err 
 		price = 0.0
 		currency = "-"
 	}
-	product = model.Product{
+	p = product.Product{
 		URL:        url,
 		Title:      title,
 		ImageURL:   imageURL,

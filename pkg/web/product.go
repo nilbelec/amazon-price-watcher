@@ -1,9 +1,9 @@
-package products
+package web
 
 import (
 	"time"
 
-	"github.com/nilbelec/amazon-price-watcher/pkg/model"
+	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 )
 
 // Product JSON representation of a Product
@@ -30,7 +30,7 @@ type Notifications struct {
 }
 
 // ToSliceOfJSONS Convert Products to JSON
-func ToSliceOfJSONS(products []model.Product) []Product {
+func ToSliceOfJSONS(products []product.Product) []Product {
 	jsons := make([]Product, 0, cap(products))
 	for _, p := range products {
 		json := toJSON(p)
@@ -39,7 +39,7 @@ func ToSliceOfJSONS(products []model.Product) []Product {
 	return jsons
 }
 
-func toJSON(product model.Product) Product {
+func toJSON(product product.Product) Product {
 	return Product{
 		URL:        product.URL,
 		Title:      product.Title,

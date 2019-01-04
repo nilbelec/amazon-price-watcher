@@ -5,7 +5,7 @@ import (
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/nilbelec/amazon-price-watcher/pkg/model"
+	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 )
 
 // BotConfig provides the telegram configuration
@@ -14,7 +14,7 @@ type BotConfig interface {
 	GetChatIDs() []int64
 }
 
-// Notifier is a telegram product notifier
+// Notifier is a telegram notifier
 type Notifier struct {
 	config BotConfig
 }
@@ -26,7 +26,7 @@ func New(config BotConfig) (n *Notifier, err error) {
 }
 
 // NotifyProductChange send a telegram bot message notifying a product change
-func (n *Notifier) NotifyProductChange(product model.Product) {
+func (n *Notifier) NotifyProductChange(product product.Product) {
 	if !n.IsConfigured() || !product.ShouldSendAnyNotification() {
 		return
 	}
@@ -41,7 +41,7 @@ func (n *Notifier) NotifyProductChange(product model.Product) {
 	return
 }
 
-func prepareNotificationMessages(product model.Product) []string {
+func prepareNotificationMessages(product product.Product) []string {
 	messages := make([]string, 0)
 	if product.ShouldSendPriceDecreasesNotification() {
 		messages = append(messages, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency))

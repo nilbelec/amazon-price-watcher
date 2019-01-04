@@ -1,11 +1,9 @@
 package configuration
 
-// Configuration has all required methods to handle the application configuration
-type Configuration interface {
+// Service helps to update or retrieve the current configuration settings
+type Service interface {
 	Update(settings *Settings) error
 	Settings() *Settings
-
-	WebServerAddress() string
 }
 
 // Settings stores the configuration settings values

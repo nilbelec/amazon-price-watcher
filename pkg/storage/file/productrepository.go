@@ -9,13 +9,13 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/nilbelec/amazon-price-watcher/pkg/model"
+	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 	"github.com/nilbelec/amazon-price-watcher/pkg/util/file"
 )
 
 // ProductRepository struct
 type ProductRepository struct {
-	products     map[string]model.Product
+	products     map[string]product.Product
 	productsFile string
 }
 
@@ -44,14 +44,14 @@ func (r *ProductRepository) saveProducts() (err error) {
 	return
 }
 
-func loadProducts(productsFile string) (products map[string]model.Product, err error) {
+func loadProducts(productsFile string) (products map[string]product.Product, err error) {
 	exists, err := file.Exists(productsFile)
 	if err != nil {
 		err = fmt.Errorf("Error checking if config file exists: %s", err.Error())
 		return
 	}
 	if exists == false {
-		products = make(map[string]model.Product)
+		products = make(map[string]product.Product)
 		return
 	}
 	file, err := os.Open(productsFile)
@@ -61,7 +61,7 @@ func loadProducts(productsFile string) (products map[string]model.Product, err e
 		return
 	}
 	decoder := json.NewDecoder(file)
-	products = make(map[string]model.Product)
+	products = make(map[string]product.Product)
 	err = decoder.Decode(&products)
 	if err != nil {
 		err = fmt.Errorf("Error parsing json from products file: %s", err.Error())
@@ -71,7 +71,7 @@ func loadProducts(productsFile string) (products map[string]model.Product, err e
 }
 
 // AddProduct stores a new Product
-func (r *ProductRepository) AddProduct(product model.Product) error {
+func (r *ProductRepository) AddProduct(product product.Product) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if _, ok := r.products[product.URL]; ok {
@@ -87,7 +87,7 @@ func (r *ProductRepository) AddProduct(product model.Product) error {
 }
 
 // DeleteProductByURL removes a product by its URL
-func (r *ProductRepository) DeleteProductByURL(url string) (product model.Product, err error) {
+func (r *ProductRepository) DeleteProductByURL(url string) (product product.Product, err error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	product, ok := r.products[url]
@@ -106,7 +106,7 @@ func (r *ProductRepository) DeleteProductByURL(url string) (product model.Produc
 }
 
 // UpdateProduct updates an existing product
-func (r *ProductRepository) UpdateProduct(product model.Product) error {
+func (r *ProductRepository) UpdateProduct(product product.Product) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	old, ok := r.products[product.URL]
@@ -124,10 +124,10 @@ func (r *ProductRepository) UpdateProduct(product model.Product) error {
 }
 
 // ListProducts list all products
-func (r *ProductRepository) ListProducts() ([]model.Product, error) {
+func (r *ProductRepository) ListProducts() ([]product.Product, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
-	v := make([]model.Product, 0, len(r.products))
+	v := make([]product.Product, 0, len(r.products))
 	for _, value := range r.products {
 		v = append(v, value)
 	}
@@ -144,7 +144,7 @@ func (r *ProductRepository) ListProducts() ([]model.Product, error) {
 }
 
 // GetProductByURL gets an existing product by its URL
-func (r *ProductRepository) GetProductByURL(url string) (product model.Product, err error) {
+func (r *ProductRepository) GetProductByURL(url string) (product product.Product, err error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	product, ok := r.products[url]

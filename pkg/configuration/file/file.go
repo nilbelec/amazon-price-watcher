@@ -118,8 +118,8 @@ func (f *File) GetRefreshInterval() time.Duration {
 	return time.Duration(f.settings.ProductsRefreshIntervalInMinutes) * time.Minute
 }
 
-// WebServerAddress get the web server address
-func (f *File) WebServerAddress() string {
+// Address get the web server address
+func (f *File) Address() string {
 	f.Lock()
 	defer f.Unlock()
 	return fmt.Sprintf(":%d", f.settings.WebServerPort)
