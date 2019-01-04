@@ -15,10 +15,10 @@ type jsonSettings struct {
 }
 
 type configurationHandler struct {
-	cs configuration.Service
+	cs *configuration.Service
 }
 
-func newConfigurationHandler(cs configuration.Service) *configurationHandler {
+func newConfigurationHandler(cs *configuration.Service) *configurationHandler {
 	return &configurationHandler{cs}
 }
 
@@ -63,7 +63,7 @@ func (h *configurationHandler) handleConfigurationPost(w http.ResponseWriter, r 
 		TelegramBotToken:                 jsonSettings.TelegramBotToken,
 		TelegramChatIDs:                  jsonSettings.TelegramChatIDs,
 	}
-	err = h.cs.Update(settings)
+	err = h.cs.Save(settings)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

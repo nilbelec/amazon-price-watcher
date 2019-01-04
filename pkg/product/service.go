@@ -6,6 +6,22 @@ import (
 	"time"
 )
 
+// Configuration handles the products configuration
+type Configuration interface {
+	RefreshInterval() time.Duration
+}
+
+// Crawler handles the products crawling
+type Crawler interface {
+	ExtractProduct(url string) (Product, error)
+}
+
+// Notifier handles the products notifications
+type Notifier interface {
+	NotifyChanges(product Product)
+	IsConfigured() bool
+}
+
 // Repository handles the products persistence
 type Repository interface {
 	AddProduct(product Product) error
@@ -13,22 +29,6 @@ type Repository interface {
 	ListProducts() ([]Product, error)
 	UpdateProduct(product Product) error
 	GetProductByURL(url string) (Product, error)
-}
-
-// Crawler handles the products crawling
-type Crawler interface {
-	FindByURL(url string) (Product, error)
-}
-
-// Configuration handles the products configuration
-type Configuration interface {
-	GetRefreshInterval() time.Duration
-}
-
-// Notifier handles the products notifications
-type Notifier interface {
-	NotifyProductChange(product Product)
-	IsConfigured() bool
 }
 
 // Service struct
@@ -51,18 +51,18 @@ func (ps *Service) refreshProducts() {
 		products, err := ps.repo.ListProducts()
 		if err != nil {
 			err = errors.New("Error while retrieving products: " + err.Error())
-			time.Sleep(ps.conf.GetRefreshInterval())
+			time.Sleep(ps.conf.RefreshInterval())
 			continue
 		}
 		for _, p := range products {
 			go ps.refreshProduct(p)
 		}
-		time.Sleep(ps.conf.GetRefreshInterval())
+		time.Sleep(ps.conf.RefreshInterval())
 	}
 }
 
 func (ps *Service) refreshProduct(product Product) {
-	actual, err := ps.crawler.FindByURL(product.URL)
+	actual, err := ps.crawler.ExtractProduct(product.URL)
 	if err != nil {
 		log.Println("Unable to refresh data for '" + product.URL + "': " + err.Error())
 		return
@@ -81,14 +81,14 @@ func (ps *Service) refreshProduct(product Product) {
 func (ps *Service) notifyProductChange(product Product) {
 	for _, notifier := range ps.notifiers {
 		if notifier.IsConfigured() {
-			notifier.NotifyProductChange(product)
+			notifier.NotifyChanges(product)
 		}
 	}
 }
 
 // AddProductByURL adds a new Amazon product by its URL
 func (ps *Service) AddProductByURL(url string) (product Product, err error) {
-	product, err = ps.crawler.FindByURL(url)
+	product, err = ps.crawler.ExtractProduct(url)
 	if err != nil {
 		return
 	}

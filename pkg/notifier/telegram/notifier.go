@@ -8,25 +8,25 @@ import (
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 )
 
-// BotConfig provides the telegram configuration
+// BotConfig provides the Telegram configuration
 type BotConfig interface {
 	GetBotToken() string
 	GetChatIDs() []int64
 }
 
-// Notifier is a telegram notifier
+// Notifier is the Telegram notifier
 type Notifier struct {
 	config BotConfig
 }
 
-// New creates a new telegram product notifier
+// New creates a new Telegram product notifier
 func New(config BotConfig) (n *Notifier, err error) {
 	n = &Notifier{config}
 	return
 }
 
-// NotifyProductChange send a telegram bot message notifying a product change
-func (n *Notifier) NotifyProductChange(product product.Product) {
+// NotifyChanges sends a Telegram bot message notifying a product change
+func (n *Notifier) NotifyChanges(product product.Product) {
 	if !n.IsConfigured() || !product.ShouldSendAnyNotification() {
 		return
 	}

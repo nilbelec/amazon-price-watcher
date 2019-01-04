@@ -25,8 +25,8 @@ func New() *Crawler {
 	return &Crawler{}
 }
 
-// FindByURL finds Product by Amazon URL
-func (pc *Crawler) FindByURL(inputURL string) (p product.Product, err error) {
+// ExtractProduct extracts Product information from an Amazon product URL
+func (pc *Crawler) ExtractProduct(inputURL string) (p product.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)

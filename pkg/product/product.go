@@ -16,7 +16,7 @@ type Product struct {
 	Notifications Notifications
 }
 
-// Notifications representation of a Product notifications
+// Notifications model
 type Notifications struct {
 	PriceBelows    float32
 	PriceOver      float32

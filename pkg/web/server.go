@@ -12,7 +12,7 @@ import (
 type Server struct {
 	webConfig ServerConfiguration
 	ps        *product.Service
-	cs        configuration.Service
+	cs        *configuration.Service
 }
 
 // ServerConfiguration handles the web server configuration
@@ -25,7 +25,7 @@ type handler interface {
 }
 
 // NewServer creates a new web server
-func NewServer(config ServerConfiguration, ps *product.Service, cs configuration.Service) *Server {
+func NewServer(config ServerConfiguration, ps *product.Service, cs *configuration.Service) *Server {
 	return &Server{config, ps, cs}
 }
 
