@@ -17,11 +17,11 @@ type Data struct {
 
 // Handler handles the configurations requests
 type Handler struct {
-	config *configuration.File
+	config configuration.Configuration
 }
 
 // NewHandler creates a new products handler
-func NewHandler(config *configuration.File) *Handler {
+func NewHandler(config configuration.Configuration) *Handler {
 	return &Handler{config}
 }
 
@@ -37,11 +37,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleGet(w http.ResponseWriter) {
+	settings := h.config.Settings()
 	configData := &Data{
-		ProductsRefreshIntervalInMinutes: h.config.GetProductsRefreshIntervalInMinutes(),
-		TelegramBotToken:                 h.config.GetBotToken(),
-		TelegramChatIDs:                  h.config.GetChatIDs(),
-		WebServerPort:                    h.config.GetWebServerPort(),
+		ProductsRefreshIntervalInMinutes: settings.ProductsRefreshIntervalInMinutes,
+		TelegramBotToken:                 settings.TelegramBotToken,
+		TelegramChatIDs:                  settings.TelegramChatIDs,
+		WebServerPort:                    settings.WebServerPort,
 	}
 	response, _ := json.Marshal(configData)
 
@@ -57,13 +58,13 @@ func (h *Handler) handlePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	configData := &configuration.ConfigData{
+	settings := &configuration.Settings{
 		WebServerPort:                    data.WebServerPort,
 		ProductsRefreshIntervalInMinutes: data.ProductsRefreshIntervalInMinutes,
 		TelegramBotToken:                 data.TelegramBotToken,
 		TelegramChatIDs:                  data.TelegramChatIDs,
 	}
-	err = h.config.UpdateConfigurationData(configData)
+	err = h.config.Update(settings)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

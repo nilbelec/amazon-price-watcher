@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/nilbelec/amazon-price-watcher/pkg/configuration"
-	"github.com/nilbelec/amazon-price-watcher/pkg/crawler"
+	cf "github.com/nilbelec/amazon-price-watcher/pkg/configuration/file"
+	amazon "github.com/nilbelec/amazon-price-watcher/pkg/crawler/amazon"
 	"github.com/nilbelec/amazon-price-watcher/pkg/services"
 	"github.com/nilbelec/amazon-price-watcher/pkg/storage/file"
 	"github.com/nilbelec/amazon-price-watcher/pkg/telegram"
@@ -15,7 +15,7 @@ const configFile = "config.json"
 const productsFile = "products.json"
 
 func main() {
-	config, err := configuration.Load(configFile)
+	config, err := cf.New(configFile)
 	if err != nil {
 		log.Fatalln("Error loading configuration file: " + err.Error())
 	}
@@ -29,8 +29,8 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error loading products file: " + err.Error())
 	}
-	finder := crawler.NewProductCrawler()
-	ps := services.NewProductService(repo, finder, config, notifiers)
+	crawler := amazon.New()
+	ps := services.NewProductService(repo, crawler, config, notifiers)
 
 	web := web.NewServer(ps, config, version)
 	web.Start()

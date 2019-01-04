@@ -3,6 +3,7 @@ package crawler
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,17 +16,17 @@ import (
 	"golang.org/x/net/html"
 )
 
-// ProductCrawler Amazon crawler
-type ProductCrawler struct {
+// AmazonCrawler Amazon crawler
+type AmazonCrawler struct {
 }
 
-// NewProductCrawler creates a new ProductCrawler
-func NewProductCrawler() *ProductCrawler {
-	return &ProductCrawler{}
+// New creates a new Amazon product crawler
+func New() *AmazonCrawler {
+	return &AmazonCrawler{}
 }
 
 // FindByURL finds Product by Amazon URL
-func (pc *ProductCrawler) FindByURL(inputURL string) (product model.Product, err error) {
+func (pc *AmazonCrawler) FindByURL(inputURL string) (product model.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
@@ -38,11 +39,13 @@ func (pc *ProductCrawler) FindByURL(inputURL string) (product model.Product, err
 	}
 	doc, err := loadURL(inputURL)
 	if err != nil {
+		fmt.Println("Error: " + err.Error())
 		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	url, err := findURL(doc)
 	if err != nil {
+		fmt.Println("Error: " + err.Error())
 		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}

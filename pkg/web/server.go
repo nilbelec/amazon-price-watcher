@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	config "github.com/nilbelec/amazon-price-watcher/pkg/configuration"
+	cf "github.com/nilbelec/amazon-price-watcher/pkg/configuration"
 	"github.com/nilbelec/amazon-price-watcher/pkg/services"
 
 	"github.com/nilbelec/amazon-price-watcher/pkg/web/configuration"
@@ -17,12 +17,12 @@ import (
 // Server web server
 type Server struct {
 	ps      *services.ProductService
-	config  *config.File
+	config  cf.Configuration
 	version string
 }
 
 // NewServer creates a new web server
-func NewServer(ps *services.ProductService, config *config.File, version string) *Server {
+func NewServer(ps *services.ProductService, config cf.Configuration, version string) *Server {
 	return &Server{ps, config, version}
 }
 
@@ -33,6 +33,6 @@ func (w *Server) Start() {
 	http.Handle("/configuration", configuration.NewHandler(w.config))
 	http.Handle("/notifications", notifications.NewHandler(w.ps))
 	http.Handle("/version", version.NewHandler(w.version))
-	log.Println("Web server started at " + w.config.GetAddress())
-	log.Fatal(http.ListenAndServe(w.config.GetAddress(), nil))
+	log.Println("Web server started at " + w.config.WebServerAddress())
+	log.Fatal(http.ListenAndServe(w.config.WebServerAddress(), nil))
 }
