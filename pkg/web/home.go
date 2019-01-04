@@ -7,7 +7,14 @@ import (
 	"github.com/gobuffalo/packr"
 )
 
-func (s *Server) handleHome() http.HandlerFunc {
+type homeHandler struct {
+}
+
+func newHomeHandler() *homeHandler {
+	return &homeHandler{}
+}
+
+func (h *homeHandler) handlerFunc() http.HandlerFunc {
 	box := packr.NewBox(".")
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {

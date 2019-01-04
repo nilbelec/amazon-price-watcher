@@ -20,6 +20,10 @@ type ServerConfiguration interface {
 	Address() string
 }
 
+type handler interface {
+	handlerFunc() http.HandlerFunc
+}
+
 // NewServer creates a new web server
 func NewServer(config ServerConfiguration, ps *product.Service, cs configuration.Service) *Server {
 	return &Server{config, ps, cs}
@@ -27,15 +31,16 @@ func NewServer(config ServerConfiguration, ps *product.Service, cs configuration
 
 // Start starts the web server
 func (s *Server) Start() {
-	s.prepareHandlers()
+	s.addHandler("/", newHomeHandler())
+	s.addHandler("/products", newProductsHandler(s.ps))
+	s.addHandler("/configuration", newConfigurationHandler(s.cs))
+	s.addHandler("/notifications", newNotificationsHandler(s.ps))
+	s.addHandler("/version", newVersionHandler())
+
 	log.Println("Web server started at " + s.webConfig.Address())
 	log.Fatal(http.ListenAndServe(s.webConfig.Address(), nil))
 }
 
-func (s *Server) prepareHandlers() {
-	http.HandleFunc("/", s.handleHome())
-	http.HandleFunc("/products", s.handleProducts())
-	http.HandleFunc("/configuration", s.handleConfiguration())
-	http.HandleFunc("/notifications", s.handleNotifications())
-	http.HandleFunc("/version", s.handleVersion())
+func (s *Server) addHandler(pattern string, h handler) {
+	http.HandleFunc(pattern, h.handlerFunc())
 }

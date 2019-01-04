@@ -40,8 +40,8 @@ type Service struct {
 }
 
 // New creates a new Product Service
-func New(repo Repository, finder Crawler, conf Configuration, notifiers []Notifier) (ps *Service) {
-	ps = &Service{repo, finder, conf, notifiers}
+func New(repo Repository, crawler Crawler, conf Configuration, notifiers []Notifier) (ps *Service) {
+	ps = &Service{repo, crawler, conf, notifiers}
 	go ps.refreshProducts()
 	return
 }

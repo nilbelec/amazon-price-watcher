@@ -7,7 +7,15 @@ import (
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 )
 
-func (s *Server) handleNotifications() http.HandlerFunc {
+type notificationsHandler struct {
+	ps *product.Service
+}
+
+func newNotificationsHandler(ps *product.Service) *notificationsHandler {
+	return &notificationsHandler{ps}
+}
+
+func (h *notificationsHandler) handlerFunc() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.NotFound(w, r)
@@ -33,7 +41,7 @@ func (s *Server) handleNotifications() http.HandlerFunc {
 			PriceIncreases: data.PriceIncreases,
 			PriceOver:      data.PriceOver,
 		}
-		err = s.ps.UpdateProductNotifications(url, notifications)
+		err = h.ps.UpdateProductNotifications(url, notifications)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

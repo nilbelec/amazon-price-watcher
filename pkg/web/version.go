@@ -16,7 +16,14 @@ type appVersion struct {
 	Current string `json:"current"`
 }
 
-func (s *Server) handleVersion() http.HandlerFunc {
+type versionHandler struct {
+}
+
+func newVersionHandler() *versionHandler {
+	return &versionHandler{}
+}
+
+func (h *versionHandler) handlerFunc() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.NotFound(w, r)

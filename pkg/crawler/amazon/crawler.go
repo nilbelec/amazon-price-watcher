@@ -111,6 +111,10 @@ func doRequest(url string) (*http.Response, error) {
 
 func findURL(doc *html.Node) (url string, err error) {
 	node := htmlquery.FindOne(doc, "/html/head/link[@rel=\"canonical\"]")
+	if node == nil {
+		err = errors.New("URL element not found")
+		return
+	}
 	url = strings.TrimSpace(htmlquery.SelectAttr(node, "href"))
 	if url == "" {
 		err = errors.New("URL href attr not found")

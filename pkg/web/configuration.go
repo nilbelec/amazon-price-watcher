@@ -14,21 +14,29 @@ type jsonSettings struct {
 	TelegramChatIDs                  []int64 `json:"telegram_chat_ids"`
 }
 
-func (s *Server) handleConfiguration() http.HandlerFunc {
+type configurationHandler struct {
+	cs configuration.Service
+}
+
+func newConfigurationHandler(cs configuration.Service) *configurationHandler {
+	return &configurationHandler{cs}
+}
+
+func (h *configurationHandler) handlerFunc() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
-			handleConfigurationGet(s.cs, w)
+			h.handleConfigurationGet(w)
 			return
 		} else if r.Method == "POST" {
-			handleConfigurationPost(s.cs, w, r)
+			h.handleConfigurationPost(w, r)
 			return
 		}
 		http.NotFound(w, r)
 	}
 }
 
-func handleConfigurationGet(cs configuration.Service, w http.ResponseWriter) {
-	s := cs.Settings()
+func (h *configurationHandler) handleConfigurationGet(w http.ResponseWriter) {
+	s := h.cs.Settings()
 	jsonSettings := &jsonSettings{
 		ProductsRefreshIntervalInMinutes: s.ProductsRefreshIntervalInMinutes,
 		TelegramBotToken:                 s.TelegramBotToken,
@@ -41,7 +49,7 @@ func handleConfigurationGet(cs configuration.Service, w http.ResponseWriter) {
 	w.Write(response)
 }
 
-func handleConfigurationPost(cs configuration.Service, w http.ResponseWriter, r *http.Request) {
+func (h *configurationHandler) handleConfigurationPost(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var jsonSettings jsonSettings
 	err := decoder.Decode(&jsonSettings)
@@ -55,7 +63,7 @@ func handleConfigurationPost(cs configuration.Service, w http.ResponseWriter, r 
 		TelegramBotToken:                 jsonSettings.TelegramBotToken,
 		TelegramChatIDs:                  jsonSettings.TelegramChatIDs,
 	}
-	err = cs.Update(settings)
+	err = h.cs.Update(settings)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
