@@ -7,28 +7,28 @@ import (
 )
 
 // Exists checks if a file/folder exists
-func Exists(name string) (bool, error) {
-	_, err := os.Stat(name)
+func Exists(filename string) (bool, error) {
+	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false, nil
 	}
 	return err == nil, err
 }
 
-// SaveJSON creates/overwrites a JSON file with the specified object data
-func SaveJSON(fileName string, object interface{}) error {
-	data, err := json.MarshalIndent(object, "", " ")
+// SaveJSON saves the object to a JSON file
+func SaveJSON(filename string, v interface{}) error {
+	b, err := json.MarshalIndent(v, "", " ")
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(fileName, data, 0644)
+	return ioutil.WriteFile(filename, b, 0644)
 }
 
-// ReadJSON get the object data from a JSON file
-func ReadJSON(fileName string, object interface{}) error {
-	data, err := ioutil.ReadFile(fileName)
+// ReadJSON reads the object from a JSON file
+func ReadJSON(filename string, v interface{}) error {
+	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(data, object)
+	return json.Unmarshal(b, v)
 }

@@ -17,20 +17,23 @@ const productsFile = "products.json"
 func main() {
 	cs := configurationService()
 	ps := productsService(cs)
-	web := web.NewServer(cs, ps, cs)
-	web.Start()
+	s := web.NewServer(cs, ps, cs)
+	s.Start()
 }
 
 func configurationService() *configuration.Service {
-	cf := storage.NewConfigurationFile(configFile)
-	cs, err := configuration.NewService(cf)
+	cf, err := storage.NewConfigurationFile(configFile)
 	if err != nil {
 		log.Fatalln("Error loading configuration file: " + err.Error())
+	}
+	cs, err := configuration.NewService(cf)
+	if err != nil {
+		log.Fatalln("Error loading configuration service: " + err.Error())
 	}
 	return cs
 }
 
-func prepareNotifiers(bc telegram.BotConfig) []product.Notifier {
+func notifiers(bc telegram.BotConfig) []product.Notifier {
 	ns := make([]product.Notifier, 0)
 	tn, err := telegram.NewNotifier(bc)
 	if err != nil {
@@ -41,7 +44,7 @@ func prepareNotifiers(bc telegram.BotConfig) []product.Notifier {
 }
 
 func productsService(cs *configuration.Service) *product.Service {
-	ns := prepareNotifiers(cs)
+	ns := notifiers(cs)
 	ac := amazon.NewCrawler()
 
 	pf, err := storage.NewProductsFile(productsFile)

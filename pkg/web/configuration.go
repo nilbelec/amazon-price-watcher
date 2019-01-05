@@ -57,7 +57,7 @@ func (h *configurationHandler) handleConfigurationPost(w http.ResponseWriter, r 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	settings := &configuration.Settings{
+	settings := configuration.Settings{
 		WebServerPort:                    jsonSettings.WebServerPort,
 		ProductsRefreshIntervalInMinutes: jsonSettings.ProductsRefreshIntervalInMinutes,
 		TelegramBotToken:                 jsonSettings.TelegramBotToken,

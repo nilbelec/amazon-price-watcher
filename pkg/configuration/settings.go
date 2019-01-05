@@ -9,7 +9,7 @@ type Settings struct {
 }
 
 // Defaults contains the default configuration settings values
-var Defaults = &Settings{
+var Defaults = Settings{
 	WebServerPort:                    10035,
 	ProductsRefreshIntervalInMinutes: 5,
 	TelegramBotToken:                 "",

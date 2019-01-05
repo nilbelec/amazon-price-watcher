@@ -3,7 +3,6 @@ package amazon
 import (
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -25,8 +24,8 @@ func NewCrawler() *Crawler {
 	return &Crawler{}
 }
 
-// ExtractProduct extracts Product information from an Amazon product URL
-func (pc *Crawler) ExtractProduct(inputURL string) (p product.Product, err error) {
+// Extract extracts Product information from an Amazon product URL
+func (c *Crawler) Extract(inputURL string) (p product.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
@@ -39,13 +38,11 @@ func (pc *Crawler) ExtractProduct(inputURL string) (p product.Product, err error
 	}
 	doc, err := loadURL(inputURL)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
 		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
 	url, err := findURL(doc)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
 		err = errors.New("Cannot extract the product information. Are you sure it is a valid Amazon product URL?")
 		return
 	}
