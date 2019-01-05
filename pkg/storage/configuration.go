@@ -1,36 +1,35 @@
-package file
+package storage
 
 import (
 	"sync"
 
 	"github.com/nilbelec/amazon-price-watcher/pkg/configuration"
-	"github.com/nilbelec/amazon-price-watcher/pkg/util/file"
 )
 
-// Repository handles the application configuration percistence using a file
-type Repository struct {
+// ConfigurationFile handles the application configuration persistence using a json file
+type ConfigurationFile struct {
 	sync.Mutex
 	path string
 }
 
-type settings struct {
+type settingsJSON struct {
 	WebServerPort                    int     `json:"port"`
 	ProductsRefreshIntervalInMinutes int     `json:"refresh_interval_minutes"`
 	TelegramBotToken                 string  `json:"telegram_bot_token"`
 	TelegramChatIDs                  []int64 `json:"telegram_chat_ids"`
 }
 
-// New creates the application configuration using the specified file.
-func New(configRepository string) *Repository {
-	return &Repository{path: configRepository}
+// NewConfigurationFile creates the application configuration using the specified file.
+func NewConfigurationFile(path string) *ConfigurationFile {
+	return &ConfigurationFile{path: path}
 }
 
 // Get returns the configuration values from the file
-func (r *Repository) Get() (s *configuration.Settings, err error) {
-	r.Lock()
-	defer r.Unlock()
-	json := &settings{}
-	err = file.ReadJSON(r.path, json)
+func (cf *ConfigurationFile) Get() (s *configuration.Settings, err error) {
+	cf.Lock()
+	defer cf.Unlock()
+	json := &settingsJSON{}
+	err = ReadJSON(cf.path, json)
 	if err != nil {
 		return
 	}
@@ -44,19 +43,19 @@ func (r *Repository) Get() (s *configuration.Settings, err error) {
 }
 
 // Exists checks if the configuration file exists
-func (r *Repository) Exists() (bool, error) {
-	return file.Exists(r.path)
+func (cf *ConfigurationFile) Exists() (bool, error) {
+	return Exists(cf.path)
 }
 
 // Save stores the settings values in the file
-func (r *Repository) Save(s *configuration.Settings) error {
-	r.Lock()
-	defer r.Unlock()
-	json := &settings{
+func (cf *ConfigurationFile) Save(s *configuration.Settings) error {
+	cf.Lock()
+	defer cf.Unlock()
+	json := &settingsJSON{
 		ProductsRefreshIntervalInMinutes: s.ProductsRefreshIntervalInMinutes,
 		TelegramBotToken:                 s.TelegramBotToken,
 		TelegramChatIDs:                  s.TelegramChatIDs,
 		WebServerPort:                    s.WebServerPort,
 	}
-	return file.SaveJSON(r.path, json)
+	return SaveJSON(cf.path, json)
 }

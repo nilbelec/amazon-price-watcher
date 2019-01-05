@@ -19,8 +19,8 @@ type Notifier struct {
 	config BotConfig
 }
 
-// New creates a new Telegram product notifier
-func New(config BotConfig) (n *Notifier, err error) {
+// NewNotifier creates a new Telegram product notifier
+func NewNotifier(config BotConfig) (n *Notifier, err error) {
 	n = &Notifier{config}
 	return
 }

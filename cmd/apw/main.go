@@ -3,13 +3,11 @@ package main
 import (
 	"log"
 
+	"github.com/nilbelec/amazon-price-watcher/pkg/amazon"
 	"github.com/nilbelec/amazon-price-watcher/pkg/configuration"
-
-	cf "github.com/nilbelec/amazon-price-watcher/pkg/configuration/file"
-	"github.com/nilbelec/amazon-price-watcher/pkg/crawler/amazon"
-	"github.com/nilbelec/amazon-price-watcher/pkg/notifier/telegram"
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
-	"github.com/nilbelec/amazon-price-watcher/pkg/storage/file"
+	"github.com/nilbelec/amazon-price-watcher/pkg/storage"
+	"github.com/nilbelec/amazon-price-watcher/pkg/telegram"
 	"github.com/nilbelec/amazon-price-watcher/pkg/web"
 )
 
@@ -17,24 +15,39 @@ const configFile = "config.json"
 const productsFile = "products.json"
 
 func main() {
-	configRepo := cf.New(configFile)
-	config, err := configuration.New(configRepo)
+	cs := configurationService()
+	ps := productsService(cs)
+	web := web.NewServer(cs, ps, cs)
+	web.Start()
+}
+
+func configurationService() *configuration.Service {
+	cf := storage.NewConfigurationFile(configFile)
+	cs, err := configuration.NewService(cf)
 	if err != nil {
 		log.Fatalln("Error loading configuration file: " + err.Error())
 	}
-	notifiers := make([]product.Notifier, 0)
-	telegram, err := telegram.New(config)
+	return cs
+}
+
+func prepareNotifiers(bc telegram.BotConfig) []product.Notifier {
+	ns := make([]product.Notifier, 0)
+	tn, err := telegram.NewNotifier(bc)
 	if err != nil {
 		log.Fatalln("Error preparing the Telegram notifier: " + err.Error())
 	}
-	notifiers = append(notifiers, telegram)
-	repo, err := file.New(productsFile)
+	ns = append(ns, tn)
+	return ns
+}
+
+func productsService(cs *configuration.Service) *product.Service {
+	ns := prepareNotifiers(cs)
+	ac := amazon.NewCrawler()
+
+	pf, err := storage.NewProductsFile(productsFile)
 	if err != nil {
 		log.Fatalln("Error loading products file: " + err.Error())
 	}
-	crawler := amazon.New()
-	ps := product.New(repo, crawler, config, notifiers)
-
-	web := web.NewServer(config, ps, config)
-	web.Start()
+	ps := product.NewService(pf, ac, cs, ns)
+	return ps
 }

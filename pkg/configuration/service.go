@@ -18,8 +18,8 @@ type Service struct {
 	settings *Settings
 }
 
-// New creates a new configuration service
-func New(repo Repository) (s *Service, err error) {
+// NewService creates a new configuration service
+func NewService(repo Repository) (s *Service, err error) {
 	s = &Service{repo: repo}
 	err = s.init()
 	return

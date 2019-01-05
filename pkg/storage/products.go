@@ -1,4 +1,4 @@
-package file
+package storage
 
 import (
 	"encoding/json"
@@ -10,29 +10,29 @@ import (
 	"sync"
 
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
-	"github.com/nilbelec/amazon-price-watcher/pkg/util/file"
 )
 
-// ProductRepository struct
-type ProductRepository struct {
+// ProductsFile struct
+type ProductsFile struct {
+	sync.Mutex
 	products     map[string]product.Product
 	productsFile string
 }
 
-var mutex = &sync.Mutex{}
-
-// New creates a new file-based ProductRepository
-func New(productsFile string) (ps *ProductRepository, err error) {
+// NewProductsFile creates a new JSON file-based products repository
+func NewProductsFile(productsFile string) (ps *ProductsFile, err error) {
 	products, err := loadProducts(productsFile)
 	if err != nil {
 		err = fmt.Errorf("Error loading products from file: %s", err.Error())
 		return
 	}
-	ps = &ProductRepository{products, productsFile}
+	ps = &ProductsFile{products: products, productsFile: productsFile}
 	return
 }
 
-func (r *ProductRepository) saveProducts() (err error) {
+func (r *ProductsFile) saveProducts() (err error) {
+	r.Lock()
+	defer r.Unlock()
 	data, err := json.MarshalIndent(&r.products, "", " ")
 	if err != nil {
 		return
@@ -45,7 +45,7 @@ func (r *ProductRepository) saveProducts() (err error) {
 }
 
 func loadProducts(productsFile string) (products map[string]product.Product, err error) {
-	exists, err := file.Exists(productsFile)
+	exists, err := Exists(productsFile)
 	if err != nil {
 		err = fmt.Errorf("Error checking if config file exists: %s", err.Error())
 		return
@@ -71,9 +71,7 @@ func loadProducts(productsFile string) (products map[string]product.Product, err
 }
 
 // AddProduct stores a new Product
-func (r *ProductRepository) AddProduct(product product.Product) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (r *ProductsFile) AddProduct(product product.Product) error {
 	if _, ok := r.products[product.URL]; ok {
 		return errors.New("The product is already on your watchlist")
 	}
@@ -87,9 +85,7 @@ func (r *ProductRepository) AddProduct(product product.Product) error {
 }
 
 // DeleteProductByURL removes a product by its URL
-func (r *ProductRepository) DeleteProductByURL(url string) (product product.Product, err error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (r *ProductsFile) DeleteProductByURL(url string) (product product.Product, err error) {
 	product, ok := r.products[url]
 	if !ok {
 		err = errors.New("The product is not on your watchlist")
@@ -106,9 +102,7 @@ func (r *ProductRepository) DeleteProductByURL(url string) (product product.Prod
 }
 
 // UpdateProduct updates an existing product
-func (r *ProductRepository) UpdateProduct(product product.Product) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (r *ProductsFile) UpdateProduct(product product.Product) error {
 	old, ok := r.products[product.URL]
 	if !ok {
 		return errors.New("The product is not on your watchlist")
@@ -124,9 +118,9 @@ func (r *ProductRepository) UpdateProduct(product product.Product) error {
 }
 
 // ListProducts list all products
-func (r *ProductRepository) ListProducts() ([]product.Product, error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (r *ProductsFile) ListProducts() ([]product.Product, error) {
+	r.Lock()
+	defer r.Unlock()
 	v := make([]product.Product, 0, len(r.products))
 	for _, value := range r.products {
 		v = append(v, value)
@@ -144,9 +138,9 @@ func (r *ProductRepository) ListProducts() ([]product.Product, error) {
 }
 
 // GetProductByURL gets an existing product by its URL
-func (r *ProductRepository) GetProductByURL(url string) (product product.Product, err error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (r *ProductsFile) GetProductByURL(url string) (product product.Product, err error) {
+	r.Lock()
+	defer r.Unlock()
 	product, ok := r.products[url]
 	if !ok {
 		err = errors.New("The product is not on your watchlist")

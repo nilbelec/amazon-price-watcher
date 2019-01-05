@@ -39,8 +39,8 @@ type Service struct {
 	notifiers []Notifier
 }
 
-// New creates a new Product Service
-func New(repo Repository, crawler Crawler, conf Configuration, notifiers []Notifier) (ps *Service) {
+// NewService creates a new Product Service
+func NewService(repo Repository, crawler Crawler, conf Configuration, notifiers []Notifier) (ps *Service) {
 	ps = &Service{repo, crawler, conf, notifiers}
 	go ps.refreshProducts()
 	return

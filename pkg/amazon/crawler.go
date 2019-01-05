@@ -20,8 +20,8 @@ import (
 type Crawler struct {
 }
 
-// New creates a new Amazon product crawler
-func New() *Crawler {
+// NewCrawler creates a new Amazon product crawler
+func NewCrawler() *Crawler {
 	return &Crawler{}
 }
 
