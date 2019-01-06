@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/nilbelec/amazon-price-watcher/pkg/github"
+	"github.com/nilbelec/amazon-price-watcher/pkg/version"
+
 	"github.com/nilbelec/amazon-price-watcher/pkg/amazon"
 	"github.com/nilbelec/amazon-price-watcher/pkg/configuration"
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
@@ -11,13 +14,19 @@ import (
 	"github.com/nilbelec/amazon-price-watcher/pkg/web"
 )
 
-const configFile = "config.json"
-const productsFile = "products.json"
+const (
+	configFile   = "config.json"
+	productsFile = "products.json"
+	gitHubUser   = "nilbelec"
+	gitHubRepo   = "amazon-price-watcher"
+)
 
 func main() {
 	cs := configurationService()
 	ps := productsService(cs)
-	s := web.NewServer(cs, ps, cs)
+	gh := github.NewClient(gitHubUser, gitHubRepo)
+	vs := version.NewService(gh)
+	s := web.NewServer(ps, cs, vs)
 	s.Start()
 }
 
@@ -33,14 +42,11 @@ func configurationService() *configuration.Service {
 	return cs
 }
 
-func notifiers(bc telegram.BotConfig) []product.Notifier {
-	ns := make([]product.Notifier, 0)
-	tn, err := telegram.NewNotifier(bc)
-	if err != nil {
-		log.Fatalln("Error preparing the Telegram notifier: " + err.Error())
-	}
+func notifiers(bc telegram.Configuration) *product.Notifiers {
+	ns := make(product.Notifiers, 0)
+	tn := telegram.NewNotifier(bc)
 	ns = append(ns, tn)
-	return ns
+	return &ns
 }
 
 func productsService(cs *configuration.Service) *product.Service {

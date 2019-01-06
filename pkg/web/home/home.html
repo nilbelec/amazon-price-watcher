@@ -371,7 +371,7 @@
     </main>
 
     <footer class="footer mt-auto py-3">
-        <div class="container">
+        <div class="container-fluid">
             <span class="float-right">
                 &copy; 2019
                 <a href="http://www.monkeyprojectz.com" target="_blank">monkeyprojectz.com</a>
@@ -400,6 +400,17 @@
                 decimal: ','
             }
         });
+    </script>
+
+    <script>
+        $.postJSON = function(url, data){
+            return $.ajax({
+                url : url,
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                method: 'POST'
+            });
+        }
     </script>
 
     <script>
@@ -582,18 +593,18 @@
                 }
                 var url = "/notifications?url=" + encodeURIComponent(p.URL);
                 $('#save-notifications-btn, #notifications-modal input').prop('disabled', true);
-                $.post(url, JSON.stringify(data))
-                    .done(function () {
-                        showSuccess('Notifications saved');
-                        loadProducts();
-                        $('#notifications-modal').modal('hide');
-                    })
-                    .fail(function (xhr) {
-                        showError(xhr.responseText);
-                    })
-                    .always(function () {
-                        $('#save-notifications-btn, #notifications-modal input').prop('disabled', false);
-                    })
+                $.postJSON(url, data)
+                .done(function () {
+                    showSuccess('Notifications saved');
+                    loadProducts();
+                    $('#notifications-modal').modal('hide');
+                })
+                .fail(function (xhr) {
+                    showError(xhr.responseText);
+                })
+                .always(function () {
+                    $('#save-notifications-btn, #notifications-modal input').prop('disabled', false);
+                })
             });
 
             var showError = function (message) {
@@ -698,17 +709,17 @@
                     telegram_bot_token: token,
                     telegram_chat_ids: chatIds
                 }
-                $.post('/configuration', JSON.stringify(data))
-                    .done(function () {
-                        showSuccess('Configuration saved');
-                        $('#configuration-modal').modal('hide');
-                    })
-                    .fail(function (xhr) {
-                        showError(xhr.responseText);
-                    })
-                    .always(function () {
-                        $('#configuration-modal input, #save-configuration-btn').prop('disabled', false);
-                    })
+                $.postJSON('/configuration', data)
+                .done(function () {
+                    showSuccess('Configuration saved');
+                    $('#configuration-modal').modal('hide');
+                })
+                .fail(function (xhr) {
+                    showError(xhr.responseText ? xhr.responseText : 'Ups! There was an error while trying to save the configuration');
+                })
+                .always(function () {
+                    $('#configuration-modal input, #save-configuration-btn').prop('disabled', false);
+                })
             })
 
             $('#telegram-test-btn').on('click', function () {

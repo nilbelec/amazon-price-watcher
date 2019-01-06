@@ -8,26 +8,26 @@ import (
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
 )
 
-// BotConfig provides the Telegram configuration
-type BotConfig interface {
+// Configuration provides the Telegram configuration
+type Configuration interface {
 	GetBotToken() string
 	GetChatIDs() []int64
 }
 
 // Notifier is the Telegram notifier
 type Notifier struct {
-	config BotConfig
+	config Configuration
 }
 
 // NewNotifier creates a new Telegram product notifier
-func NewNotifier(config BotConfig) (n *Notifier, err error) {
-	n = &Notifier{config}
+func NewNotifier(c Configuration) (n *Notifier) {
+	n = &Notifier{c}
 	return
 }
 
 // NotifyChanges sends a Telegram bot message notifying a product change
-func (n *Notifier) NotifyChanges(product product.Product) {
-	if !n.IsConfigured() || !product.ShouldSendAnyNotification() {
+func (n *Notifier) NotifyChanges(p *product.Product) {
+	if !n.IsConfigured() || !p.ShouldSendAnyNotification() {
 		return
 	}
 	bot, err := tgbotapi.NewBotAPI(n.config.GetBotToken())
@@ -36,44 +36,44 @@ func (n *Notifier) NotifyChanges(product product.Product) {
 		return
 	}
 
-	messages := prepareNotificationMessages(product)
-	sendNotifications(bot, messages, n.config.GetChatIDs())
+	msgs := prepareNotificationMessages(p)
+	sendNotifications(bot, msgs, n.config.GetChatIDs())
 	return
 }
 
-func prepareNotificationMessages(product product.Product) []string {
-	messages := make([]string, 0)
-	if product.ShouldSendPriceDecreasesNotification() {
-		messages = append(messages, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency))
+func prepareNotificationMessages(p *product.Product) []string {
+	msgs := make([]string, 0)
+	if p.ShouldSendPriceDecreasesNotification() {
+		msgs = append(msgs, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", p.Title, p.Price, p.Currency, p.LastPrice, p.Currency))
 	}
-	if product.ShouldSendPriceIncreasesNotification() {
-		messages = append(messages, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", product.Title, product.Price, product.Currency, product.LastPrice, product.Currency))
+	if p.ShouldSendPriceIncreasesNotification() {
+		msgs = append(msgs, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", p.Title, p.Price, p.Currency, p.LastPrice, p.Currency))
 	}
-	if product.ShouldSendPriceBelowsNotification() {
-		messages = append(messages, fmt.Sprintf("Cool! '%s' is below %.2f %s! It's now at %.2f %s (before: %.2f %s)", product.Title, product.Notifications.PriceBelows, product.Currency, product.Price, product.Currency, product.LastPrice, product.Currency))
+	if p.ShouldSendPriceBelowsNotification() {
+		msgs = append(msgs, fmt.Sprintf("Cool! '%s' is below %.2f %s! It's now at %.2f %s (before: %.2f %s)", p.Title, p.Notifications.PriceBelows, p.Currency, p.Price, p.Currency, p.LastPrice, p.Currency))
 	}
-	if product.ShouldSendPriceOverNotification() {
-		messages = append(messages, fmt.Sprintf("'%s' is over %.2f %s... It's at %.2f %s (before: %.2f %s)", product.Title, product.Notifications.PriceOver, product.Currency, product.Price, product.Currency, product.LastPrice, product.Currency))
+	if p.ShouldSendPriceOverNotification() {
+		msgs = append(msgs, fmt.Sprintf("'%s' is over %.2f %s... It's at %.2f %s (before: %.2f %s)", p.Title, p.Notifications.PriceOver, p.Currency, p.Price, p.Currency, p.LastPrice, p.Currency))
 	}
-	if product.ShouldSendBackInStockNotification() {
-		messages = append(messages, fmt.Sprintf("'%s' is back in stock! It's now at %.2f %s", product.Title, product.Price, product.Currency))
+	if p.ShouldSendBackInStockNotification() {
+		msgs = append(msgs, fmt.Sprintf("'%s' is back in stock! It's now at %.2f %s", p.Title, p.Price, p.Currency))
 	}
-	if product.ShouldSendOutOfStockNotification() {
-		messages = append(messages, fmt.Sprintf("'%s' is out of stock... Before it was at %.2f %s ", product.Title, product.LastPrice, product.Currency))
+	if p.ShouldSendOutOfStockNotification() {
+		msgs = append(msgs, fmt.Sprintf("'%s' is out of stock... Before it was at %.2f %s ", p.Title, p.LastPrice, p.Currency))
 	}
-	return messages
+	return msgs
 }
 
-func sendNotifications(bot *tgbotapi.BotAPI, messages []string, chatIDs []int64) {
-	if len(messages) == 0 || len(chatIDs) == 0 {
+func sendNotifications(bot *tgbotapi.BotAPI, msgs []string, ids []int64) {
+	if len(msgs) == 0 || len(ids) == 0 {
 		return
 	}
-	for _, text := range messages {
-		for _, chatID := range chatIDs {
-			msg := tgbotapi.NewMessage(chatID, text)
-			_, err := bot.Send(msg)
+	for _, msg := range msgs {
+		for _, id := range ids {
+			m := tgbotapi.NewMessage(id, msg)
+			_, err := bot.Send(m)
 			if err != nil {
-				log.Printf("Error sending message to chatID %d: %s\n", chatID, err.Error())
+				log.Printf("Error sending message to chatID %d: %s\n", id, err.Error())
 			}
 		}
 	}

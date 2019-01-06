@@ -25,7 +25,7 @@ func NewCrawler() *Crawler {
 }
 
 // Extract extracts Product information from an Amazon product URL
-func (c *Crawler) Extract(inputURL string) (p product.Product, err error) {
+func (c *Crawler) Extract(inputURL string) (p *product.Product, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(error)
@@ -61,7 +61,7 @@ func (c *Crawler) Extract(inputURL string) (p product.Product, err error) {
 		price = 0.0
 		currency = "-"
 	}
-	p = product.Product{
+	p = &product.Product{
 		URL:        url,
 		Title:      title,
 		ImageURL:   imageURL,

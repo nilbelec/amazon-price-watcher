@@ -7,7 +7,7 @@ import (
 
 // Repository handles the configuration persistence
 type Repository interface {
-	Save(settings Settings) error
+	Save(settings *Settings) error
 	Exists() (bool, error)
 	Get() *Settings
 }
@@ -33,7 +33,7 @@ func (s *Service) createIfNotExists() (err error) {
 }
 
 // Save saves/overwrites the settings values
-func (s *Service) Save(settings Settings) error {
+func (s *Service) Save(settings *Settings) error {
 	return s.repo.Save(settings)
 }
 

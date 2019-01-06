@@ -13,8 +13,11 @@ type Product struct {
 	Added         time.Time
 	LastUpdate    time.Time
 	changed       bool
-	Notifications Notifications
+	Notifications *Notifications
 }
+
+// Products is a slice of Product
+type Products []*Product
 
 // Notifications model
 type Notifications struct {
@@ -27,7 +30,7 @@ type Notifications struct {
 }
 
 // UpdateInfo updates the product values
-func (p *Product) UpdateInfo(other Product) {
+func (p *Product) UpdateInfo(other *Product) {
 	p.changed = false
 	p.Title = other.Title
 	p.ImageURL = other.ImageURL

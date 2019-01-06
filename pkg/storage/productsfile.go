@@ -12,12 +12,19 @@ import (
 type ProductsFile struct {
 	sync.Mutex
 	filename string
-	products map[string]product.Product
+	products productsMap
 }
+
+type productsMap map[string]*product.Product
 
 // NewProductsFile creates a new ProductsFile to store the products
 func NewProductsFile(filename string) (pf *ProductsFile, err error) {
 	pf = &ProductsFile{filename: filename}
+	exists, err := Exists(pf.filename)
+	if !exists || err != nil {
+		pf.products = make(productsMap)
+		return
+	}
 	err = pf.load()
 	return
 }
@@ -35,9 +42,12 @@ func (pf *ProductsFile) load() (err error) {
 }
 
 // Add stores a new product
-func (pf *ProductsFile) Add(p product.Product) error {
+func (pf *ProductsFile) Add(p *product.Product) error {
 	if _, ok := pf.products[p.URL]; ok {
 		return errors.New("The product is already on your watchlist")
+	}
+	if p.Notifications == nil {
+		p.Notifications = &product.Notifications{}
 	}
 	pf.products[p.URL] = p
 	err := pf.persists()
@@ -49,7 +59,7 @@ func (pf *ProductsFile) Add(p product.Product) error {
 }
 
 // Delete removes a product by using its URL
-func (pf *ProductsFile) Delete(url string) (p product.Product, err error) {
+func (pf *ProductsFile) Delete(url string) (p *product.Product, err error) {
 	p, ok := pf.products[url]
 	if !ok {
 		err = errors.New("The product is not on your watchlist")
@@ -66,7 +76,7 @@ func (pf *ProductsFile) Delete(url string) (p product.Product, err error) {
 }
 
 // Update updates an existing product
-func (pf *ProductsFile) Update(p product.Product) error {
+func (pf *ProductsFile) Update(p *product.Product) error {
 	old, ok := pf.products[p.URL]
 	if !ok {
 		return errors.New("The product is not on your watchlist")
@@ -82,8 +92,8 @@ func (pf *ProductsFile) Update(p product.Product) error {
 }
 
 // List lists all products
-func (pf *ProductsFile) List() ([]product.Product, error) {
-	p := make([]product.Product, 0, len(pf.products))
+func (pf *ProductsFile) List() (*product.Products, error) {
+	p := make(product.Products, 0, len(pf.products))
 	for _, value := range pf.products {
 		p = append(p, value)
 	}
@@ -96,11 +106,11 @@ func (pf *ProductsFile) List() ([]product.Product, error) {
 		}
 		return p[i].Added.After(p[j].Added)
 	})
-	return p, nil
+	return &p, nil
 }
 
 // Get gets an existing product by its URL
-func (pf *ProductsFile) Get(url string) (p product.Product, err error) {
+func (pf *ProductsFile) Get(url string) (p *product.Product, err error) {
 	p, ok := pf.products[url]
 	if !ok {
 		err = errors.New("The product is not on your watchlist")

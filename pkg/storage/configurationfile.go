@@ -10,7 +10,7 @@ import (
 type ConfigurationFile struct {
 	sync.Mutex
 	filename string
-	settings configuration.Settings
+	settings *configuration.Settings
 }
 
 type settingsJSON struct {
@@ -23,6 +23,10 @@ type settingsJSON struct {
 // NewConfigurationFile creates a new ConfigurationFile to handle the configuration persistence
 func NewConfigurationFile(filename string) (cf *ConfigurationFile, err error) {
 	cf = &ConfigurationFile{filename: filename}
+	exists, err := cf.Exists()
+	if !exists || err != nil {
+		return
+	}
 	err = cf.load()
 	return
 }
@@ -47,7 +51,7 @@ func (cf *ConfigurationFile) load() (err error) {
 	if err != nil {
 		return
 	}
-	cf.settings = configuration.Settings{
+	cf.settings = &configuration.Settings{
 		ProductsRefreshIntervalInMinutes: json.ProductsRefreshIntervalInMinutes,
 		TelegramBotToken:                 json.TelegramBotToken,
 		TelegramChatIDs:                  json.TelegramChatIDs,
@@ -58,7 +62,7 @@ func (cf *ConfigurationFile) load() (err error) {
 
 // Get returns the current configuration values
 func (cf *ConfigurationFile) Get() *configuration.Settings {
-	return &cf.settings
+	return cf.settings
 }
 
 // Exists checks if the configuration file exists
@@ -67,7 +71,7 @@ func (cf *ConfigurationFile) Exists() (bool, error) {
 }
 
 // Save stores the settings values in the file
-func (cf *ConfigurationFile) Save(s configuration.Settings) error {
+func (cf *ConfigurationFile) Save(s *configuration.Settings) error {
 	cf.settings = s
 	return cf.persist()
 }
