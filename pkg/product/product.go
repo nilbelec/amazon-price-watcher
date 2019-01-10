@@ -79,22 +79,22 @@ func (p *Product) ShouldSendAnyNotification() bool {
 
 // ShouldSendPriceDecreasesNotification returns true if should trigger a "price decreases" notification
 func (p *Product) ShouldSendPriceDecreasesNotification() bool {
-	return p.Notifications.PriceDecreases && p.changed && p.LastPrice > p.Price
+	return p.Notifications.PriceDecreases && p.changed && p.Price > 0 && p.LastPrice > p.Price
 }
 
 // ShouldSendPriceIncreasesNotification returns true if should trigger a "price increases" notification
 func (p *Product) ShouldSendPriceIncreasesNotification() bool {
-	return p.Notifications.PriceIncreases && p.changed && p.LastPrice < p.Price
+	return p.Notifications.PriceIncreases && p.changed && p.Price > 0 && p.LastPrice < p.Price
 }
 
 // ShouldSendPriceBelowsNotification returns true if should trigger a "price belows" notification
 func (p *Product) ShouldSendPriceBelowsNotification() bool {
-	return p.Notifications.PriceBelows > 0 && p.changed && p.Price <= p.Notifications.PriceBelows
+	return p.Notifications.PriceBelows > 0 && p.changed && p.Price > 0 && p.Price <= p.Notifications.PriceBelows
 }
 
 // ShouldSendPriceOverNotification returns true if should trigger a "price over" notification
 func (p *Product) ShouldSendPriceOverNotification() bool {
-	return p.Notifications.PriceOver > 0 && p.changed && p.Price >= p.Notifications.PriceOver
+	return p.Notifications.PriceOver > 0 && p.changed && p.Price > 0 && p.Price >= p.Notifications.PriceOver
 }
 
 // ShouldSendBackInStockNotification returns true if should trigger a "back in stock" notification
