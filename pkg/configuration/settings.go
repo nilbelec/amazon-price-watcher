@@ -6,6 +6,11 @@ type Settings struct {
 	ProductsRefreshIntervalInMinutes int
 	TelegramBotToken                 string
 	TelegramChatIDs                  []int64
+	SMTPHost                         string
+	SMTPPort                         int
+	SMTPUsername                     string
+	SMTPPassword                     string
+	SMTPTo                           []string
 }
 
 // Defaults contains the default configuration settings values
@@ -14,4 +19,9 @@ var Defaults = &Settings{
 	ProductsRefreshIntervalInMinutes: 5,
 	TelegramBotToken:                 "",
 	TelegramChatIDs:                  make([]int64, 0),
+	SMTPHost:                         "",
+	SMTPPort:                         0,
+	SMTPUsername:                     "",
+	SMTPPassword:                     "",
+	SMTPTo:                           make([]string, 0),
 }

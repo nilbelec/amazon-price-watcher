@@ -14,10 +14,15 @@ type ConfigurationFile struct {
 }
 
 type settingsJSON struct {
-	WebServerPort                    int     `json:"port"`
-	ProductsRefreshIntervalInMinutes int     `json:"refresh_interval_minutes"`
-	TelegramBotToken                 string  `json:"telegram_bot_token"`
-	TelegramChatIDs                  []int64 `json:"telegram_chat_ids"`
+	WebServerPort                    int      `json:"port"`
+	ProductsRefreshIntervalInMinutes int      `json:"refresh_interval_minutes"`
+	TelegramBotToken                 string   `json:"telegram_bot_token"`
+	TelegramChatIDs                  []int64  `json:"telegram_chat_ids"`
+	SMTPHost                         string   `json:"smtp_host"`
+	SMTPPort                         int      `json:"smtp_port"`
+	SMTPUsername                     string   `json:"smtp_username"`
+	SMTPPassword                     string   `json:"smtp_password"`
+	SMTPTo                           []string `json:"smtp_to"`
 }
 
 // NewConfigurationFile creates a new ConfigurationFile to handle the configuration persistence
@@ -39,6 +44,11 @@ func (cf *ConfigurationFile) persist() (err error) {
 		TelegramBotToken:                 cf.settings.TelegramBotToken,
 		TelegramChatIDs:                  cf.settings.TelegramChatIDs,
 		WebServerPort:                    cf.settings.WebServerPort,
+		SMTPHost:                         cf.settings.SMTPHost,
+		SMTPPort:                         cf.settings.SMTPPort,
+		SMTPUsername:                     cf.settings.SMTPUsername,
+		SMTPPassword:                     cf.settings.SMTPPassword,
+		SMTPTo:                           cf.settings.SMTPTo,
 	}
 	return SaveJSON(cf.filename, &json)
 }
@@ -56,6 +66,11 @@ func (cf *ConfigurationFile) load() (err error) {
 		TelegramBotToken:                 json.TelegramBotToken,
 		TelegramChatIDs:                  json.TelegramChatIDs,
 		WebServerPort:                    json.WebServerPort,
+		SMTPHost:                         json.SMTPHost,
+		SMTPPort:                         json.SMTPPort,
+		SMTPUsername:                     json.SMTPUsername,
+		SMTPPassword:                     json.SMTPPassword,
+		SMTPTo:                           json.SMTPTo,
 	}
 	return
 }

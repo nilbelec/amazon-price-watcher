@@ -16,8 +16,7 @@ import (
 )
 
 // Crawler is an Amazon crawler
-type Crawler struct {
-}
+type Crawler struct{}
 
 // NewCrawler creates a new Amazon product crawler
 func NewCrawler() *Crawler {

@@ -9,18 +9,18 @@ import (
 )
 
 // Configuration provides the Telegram configuration
-type Configuration interface {
-	GetBotToken() string
-	GetChatIDs() []int64
+type Configuration struct {
+	BotToken func() string
+	ChatIDs  func() []int64
 }
 
 // Notifier is the Telegram notifier
 type Notifier struct {
-	config Configuration
+	config *Configuration
 }
 
 // NewNotifier creates a new Telegram product notifier
-func NewNotifier(c Configuration) (n *Notifier) {
+func NewNotifier(c *Configuration) (n *Notifier) {
 	n = &Notifier{c}
 	return
 }
@@ -30,18 +30,17 @@ func (n *Notifier) NotifyChanges(p *product.Product) {
 	if !n.IsConfigured() || !p.ShouldSendAnyNotification() {
 		return
 	}
-	bot, err := tgbotapi.NewBotAPI(n.config.GetBotToken())
+	bot, err := tgbotapi.NewBotAPI(n.config.BotToken())
 	if err != nil {
 		log.Printf("Error preparing Telegram Bot: " + err.Error())
 		return
 	}
-
-	msgs := prepareNotificationMessages(p)
-	sendNotifications(bot, msgs, n.config.GetChatIDs())
+	msgs := n.prepareNotificationMessages(p)
+	n.sendNotifications(bot, msgs, n.config.ChatIDs())
 	return
 }
 
-func prepareNotificationMessages(p *product.Product) []string {
+func (n *Notifier) prepareNotificationMessages(p *product.Product) []string {
 	msgs := make([]string, 0)
 	if p.ShouldSendPriceDecreasesNotification() {
 		msgs = append(msgs, fmt.Sprintf("'%s' is now at %.2f %s (before: %.2f %s)", p.Title, p.Price, p.Currency, p.LastPrice, p.Currency))
@@ -64,7 +63,7 @@ func prepareNotificationMessages(p *product.Product) []string {
 	return msgs
 }
 
-func sendNotifications(bot *tgbotapi.BotAPI, msgs []string, ids []int64) {
+func (n *Notifier) sendNotifications(bot *tgbotapi.BotAPI, msgs []string, ids []int64) {
 	if len(msgs) == 0 || len(ids) == 0 {
 		return
 	}
@@ -81,5 +80,5 @@ func sendNotifications(bot *tgbotapi.BotAPI, msgs []string, ids []int64) {
 
 // IsConfigured tells if the Telegram Notifier is configured
 func (n *Notifier) IsConfigured() bool {
-	return n.config.GetBotToken() != "" && len(n.config.GetChatIDs()) != 0
+	return n.config.BotToken() != "" && len(n.config.ChatIDs()) != 0
 }

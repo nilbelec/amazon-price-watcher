@@ -7,8 +7,8 @@ import (
 )
 
 // Configuration handles the products configuration
-type Configuration interface {
-	RefreshInterval() time.Duration
+type Configuration struct {
+	RefreshIntervalMinutes func() int
 }
 
 // Crawler handles the products crawling
@@ -38,29 +38,30 @@ type Repository interface {
 type Service struct {
 	repo      Repository
 	crawler   Crawler
-	config    Configuration
 	notifiers *Notifiers
+	config    *Configuration
 }
 
 // NewService creates a new Product Service
-func NewService(r Repository, c Crawler, cfg Configuration, ns *Notifiers) (ps *Service) {
-	ps = &Service{r, c, cfg, ns}
+func NewService(r Repository, c Crawler, ns *Notifiers, cfg *Configuration) (ps *Service) {
+	ps = &Service{r, c, ns, cfg}
 	go ps.refreshProducts()
 	return
 }
 
 func (ps *Service) refreshProducts() {
 	for {
+		interval := time.Duration(ps.config.RefreshIntervalMinutes()) * time.Minute
 		prs, err := ps.repo.List()
 		if err != nil {
 			err = errors.New("Error while retrieving products: " + err.Error())
-			time.Sleep(ps.config.RefreshInterval())
+			time.Sleep(interval)
 			continue
 		}
 		for _, p := range *prs {
 			go ps.refreshProduct(p)
 		}
-		time.Sleep(ps.config.RefreshInterval())
+		time.Sleep(interval)
 	}
 }
 

@@ -3,6 +3,7 @@ package web
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/nilbelec/amazon-price-watcher/pkg/configuration"
 	"github.com/nilbelec/amazon-price-watcher/pkg/product"
@@ -30,8 +31,9 @@ func NewServer(ps *product.Service, cs *configuration.Service, vs *version.Servi
 
 // Start starts the web server
 func (s *Server) Start() {
-	log.Println("Web server started at " + s.configurationService.Address())
-	log.Fatal(http.ListenAndServe(s.configurationService.Address(), s.router()))
+	addr := ":" + strconv.Itoa(s.configurationService.WebServerPort())
+	log.Println("Web server started at " + addr)
+	log.Fatal(http.ListenAndServe(addr, s.router()))
 }
 
 func (s *Server) router() *router.Router {

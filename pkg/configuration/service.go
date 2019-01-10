@@ -1,10 +1,5 @@
 package configuration
 
-import (
-	"fmt"
-	"time"
-)
-
 // Repository handles the configuration persistence
 type Repository interface {
 	Save(settings *Settings) error
@@ -42,38 +37,47 @@ func (s *Service) Settings() *Settings {
 	return s.repo.Get()
 }
 
-// GetProductsRefreshIntervalInMinutes get the products refresh interval duration in minutes
-func (s *Service) GetProductsRefreshIntervalInMinutes() int {
-	ss := s.repo.Get()
-	return ss.ProductsRefreshIntervalInMinutes
+// WebServerPort get the web server port
+func (s *Service) WebServerPort() int {
+	return s.repo.Get().WebServerPort
 }
 
-// GetWebServerPort get the web server port
-func (s *Service) GetWebServerPort() int {
-	ss := s.repo.Get()
-	return ss.WebServerPort
+// ProductsRefreshIntervalInMinutes get the products refresh interval duration in minutes
+func (s *Service) ProductsRefreshIntervalInMinutes() int {
+	return s.repo.Get().ProductsRefreshIntervalInMinutes
 }
 
-// RefreshInterval get the products refresh interval duration
-func (s *Service) RefreshInterval() time.Duration {
-	ss := s.repo.Get()
-	return time.Duration(ss.ProductsRefreshIntervalInMinutes) * time.Minute
+// TelegramBotToken returns the Telegram Bot TOKEN
+func (s *Service) TelegramBotToken() string {
+	return s.repo.Get().TelegramBotToken
 }
 
-// Address get the web server address
-func (s *Service) Address() string {
-	ss := s.repo.Get()
-	return fmt.Sprintf(":%d", ss.WebServerPort)
+// TelegramChatIDs returns the Telegram Chat IDs
+func (s *Service) TelegramChatIDs() []int64 {
+	return s.repo.Get().TelegramChatIDs
 }
 
-// GetBotToken returns the Telegram Bot TOKEN
-func (s *Service) GetBotToken() string {
-	ss := s.repo.Get()
-	return ss.TelegramBotToken
+// SMTPHost returns the SMTP host value
+func (s *Service) SMTPHost() string {
+	return s.repo.Get().SMTPHost
 }
 
-// GetChatIDs returns the Telegram Chat IDs
-func (s *Service) GetChatIDs() []int64 {
-	ss := s.repo.Get()
-	return ss.TelegramChatIDs
+// SMTPPort returns the SMTP port value
+func (s *Service) SMTPPort() int {
+	return s.repo.Get().SMTPPort
+}
+
+// SMTPUsername returns the SMTP username value
+func (s *Service) SMTPUsername() string {
+	return s.repo.Get().SMTPUsername
+}
+
+// SMTPPassword returns the SMTP password value
+func (s *Service) SMTPPassword() string {
+	return s.repo.Get().SMTPPassword
+}
+
+// SMTPTo returns the SMTP receivers
+func (s *Service) SMTPTo() []string {
+	return s.repo.Get().SMTPTo
 }
